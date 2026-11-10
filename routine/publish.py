@@ -10,7 +10,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CATEGORIES = ["정책 · 제도", "중학 영어 · 내신", "입시 · 고입", "학원 운영", "학원가 소식"]
+CATEGORIES = ["교과서 · 교육과정", "중학 영어 · 내신", "정책 · 제도", "학원 운영", "에듀테크 · AI", "입시 · 고입", "학원가 소식"]
 
 
 def check(path):

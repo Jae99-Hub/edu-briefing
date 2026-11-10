@@ -32,20 +32,35 @@ RSS_SOURCES = [
     ("일반 언론", "연합뉴스 사회", "https://www.yna.co.kr/rss/society.xml", 12),
 ]
 NAVER_NEWS_QUERIES = [
-    "교육부 중학교",
+    # 교과서 · 교육과정
+    "2022 개정 교육과정 중학교",
+    "중학교 영어 교과서",
+    "교과서 검정 선정 중학교",
+    # 내신 평가 방식
+    "중학교 서술형 평가",
+    "중학교 수행평가 지침",
     "중학교 내신 평가",
-    "고입 전형 중학교",
-    "학원 교습비",
-    "사교육비 대책",
+    "성취평가제 중학교",
+    # 학원이 지켜야 할 것
+    "학원 교재 저작권",
+    "학원법 교습비",
+    # 에듀테크 · AI
+    "AI 디지털교과서",
+    "학교 AI 활용 기준",
+    # 정책 일반 · 고입
+    "교육부 중학교",
     "서울시교육청 중학교",
     "경기도교육청 중학교",
-    "중학교 영어 교육",
+    "고입 전형 중학교",
 ]
 NAVER_QUERIES = [
-    "중학교 영어 내신 기말고사 분석",
-    "중등 영어 수행평가",
+    # 학교 시험 일정 · 범위 · 출제 경향 (블로그)
+    "중학교 영어 기말고사 시험범위",
+    "중학교 영어 기말고사 분석",
+    "중2 영어 내신 서술형 기출",
+    "중학교 영어 수행평가",
     "중학교 영어 교과서 2022 개정",
-    "고입 영어 내신 경기",
+    "중3 영어 교과서 2027",
 ]
 EDU_WORDS = re.compile(r"교육|학교|학생|교사|교원|수능|입시|고입|내신|학원|교과|수업|대입|학년|교실|급식|돌봄")
 
@@ -235,8 +250,8 @@ def main():
     jobs += [("교육부 보도자료", from_moe, (), 15), ("서울시교육청 보도자료", from_sen, (), 12),
              ("경기도교육청 보도자료", from_goe, (), 15)]
     jobs += [(n, from_rss, (g, n, u, lim), lim) for g, n, u, lim in RSS_SOURCES]
-    jobs += [("뉴스 검색: " + q, from_naver_news, (q,), 8) for q in NAVER_NEWS_QUERIES]
-    jobs += [("네이버 블로그: " + q, from_naver, (q,), 8) for q in NAVER_QUERIES]
+    jobs += [("뉴스 검색: " + q, from_naver_news, (q,), 6) for q in NAVER_NEWS_QUERIES]
+    jobs += [("네이버 블로그: " + q, from_naver, (q,), 6) for q in NAVER_QUERIES]
 
     candidates, report, urls = [], [], set()
     for name, fn, args, limit in jobs:
