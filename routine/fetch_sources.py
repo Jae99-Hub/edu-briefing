@@ -15,6 +15,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -28,7 +29,6 @@ RSS_SOURCES = [
     ("교육 전문 언론", "한국교육신문", "https://www.hangyo.com/data/rss/news.xml", 15),
     ("교육 전문 언론", "베리타스알파", "https://www.veritas-a.com/rss/allArticle.xml", 15),
     ("교육 전문 언론", "에듀프레스", "https://www.edupress.kr/rss/allArticle.xml", 15),
-    ("교육 전문 언론", "에듀인뉴스", "https://www.eduinnews.co.kr/rss/allArticle.xml", 15),
     ("일반 언론", "연합뉴스 사회", "https://www.yna.co.kr/rss/society.xml", 12),
 ]
 NAVER_NEWS_QUERIES = [
@@ -55,8 +55,16 @@ def http_get(url, headers=None, timeout=20):
     if headers:
         h.update(headers)
     req = urllib.request.Request(url, headers=h)
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        raw = r.read()
+    raw = None
+    for attempt in range(3):  # 연결이 끊기는 일이 있어 두 번까지 다시 시도한다
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                raw = r.read()
+            break
+        except Exception:
+            if attempt == 2:
+                raise
+            time.sleep(2 + attempt * 3)
     for enc in ("utf-8", "cp949"):
         try:
             return raw.decode(enc)
