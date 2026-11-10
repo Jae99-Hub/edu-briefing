@@ -31,12 +31,15 @@ RSS_SOURCES = [
     ("교육 전문 언론", "에듀인뉴스", "https://www.eduinnews.co.kr/rss/allArticle.xml", 15),
     ("일반 언론", "연합뉴스 사회", "https://www.yna.co.kr/rss/society.xml", 12),
 ]
-GOOGLE_NEWS_QUERIES = [
-    ("일반 언론", "교육부"),
-    ("일반 언론", "중학교 (내신 OR 자유학기 OR 고입 OR 성취평가)"),
-    ("일반 언론", "학원 (교습비 OR 학원법 OR 사교육비)"),
-    ("일반 언론", "(서울시교육청 OR 경기도교육청) 중학교"),
-    ("일반 언론", "중학교 영어 (교육과정 OR 교과서 OR 수행평가)"),
+NAVER_NEWS_QUERIES = [
+    "교육부 중학교",
+    "중학교 내신 평가",
+    "고입 전형 중학교",
+    "학원 교습비",
+    "사교육비 대책",
+    "서울시교육청 중학교",
+    "경기도교육청 중학교",
+    "중학교 영어 교육",
 ]
 NAVER_QUERIES = [
     "중학교 영어 내신 기말고사 분석",
@@ -106,18 +109,28 @@ def from_rss(group, name, url, limit):
     return out
 
 
-def from_google_news(group, query, limit=12):
-    q = urllib.parse.quote(query + " when:2d")
-    url = "https://news.google.com/rss/search?q=%s&hl=ko&gl=KR&ceid=KR:ko" % q
-    items = from_rss(group, "구글 뉴스 검색: " + query, url, limit)
-    for it in items:
-        # 제목 끝의 " - 언론사" 를 출처로 옮긴다
-        m = re.match(r"^(.*) - ([^-]{2,30})$", it["title"])
-        if m:
-            it["title"], it["publisher"] = m.group(1).strip(), m.group(2).strip()
-        it["snippet"] = ""
-        it["note"] = "구글 뉴스 중계 주소다. 브리핑에는 열어서 확인한 언론사 원문 주소를 적는다."
-    return items
+def naver_headers():
+    cid, sec = os.environ.get("NAVER_CLIENT_ID"), os.environ.get("NAVER_CLIENT_SECRET")
+    if cid and sec:
+        return {"X-NCP-APIGW-API-KEY-ID": cid, "X-NCP-APIGW-API-KEY": sec}
+    return {}
+
+
+def from_naver_news(query, limit=30):
+    """네이버 뉴스 검색. originallink 가 언론사 원문 주소다."""
+    url = ("https://naverapihub.apigw.ntruss.com/search/v1/news?query=%s&display=%d&sort=sim&format=json"
+           % (urllib.parse.quote(query), limit))
+    data = json.loads(http_get(url, naver_headers()))
+    out = []
+    for it in data.get("items", []):
+        link = it.get("originallink") or it.get("link") or ""
+        host = urllib.parse.urlparse(link).netloc.replace("www.", "")
+        out.append({
+            "group": "일반 언론", "source": "뉴스 검색(%s): %s" % (query, host),
+            "title": clean(it.get("title")), "url": link,
+            "date": parse_date(it.get("pubDate")), "snippet": clean(it.get("description"))[:300],
+        })
+    return out
 
 
 def from_moe():
@@ -169,10 +182,7 @@ def from_goe():
 
 
 def from_naver(query, limit=10):
-    headers = {}
-    cid, sec = os.environ.get("NAVER_CLIENT_ID"), os.environ.get("NAVER_CLIENT_SECRET")
-    if cid and sec:
-        headers = {"X-NCP-APIGW-API-KEY-ID": cid, "X-NCP-APIGW-API-KEY": sec}
+    headers = naver_headers()
     url = ("https://naverapihub.apigw.ntruss.com/search/v1/blog?query=%s&display=%d&sort=date&format=json"
            % (urllib.parse.quote(query), limit))
     data = json.loads(http_get(url, headers))
@@ -217,7 +227,7 @@ def main():
     jobs += [("교육부 보도자료", from_moe, (), 15), ("서울시교육청 보도자료", from_sen, (), 12),
              ("경기도교육청 보도자료", from_goe, (), 15)]
     jobs += [(n, from_rss, (g, n, u, lim), lim) for g, n, u, lim in RSS_SOURCES]
-    jobs += [("구글 뉴스: " + q, from_google_news, (g, q), 12) for g, q in GOOGLE_NEWS_QUERIES]
+    jobs += [("뉴스 검색: " + q, from_naver_news, (q,), 8) for q in NAVER_NEWS_QUERIES]
     jobs += [("네이버 블로그: " + q, from_naver, (q,), 8) for q in NAVER_QUERIES]
 
     candidates, report, urls = [], [], set()

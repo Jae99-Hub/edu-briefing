@@ -38,8 +38,8 @@ def check(path):
         url = str(it.get("url") or "")
         if not re.match(r"^https?://", url):
             errors.append("%d번 항목: url 이 http 주소가 아니다" % i)
-        if "news.google.com" in url:
-            errors.append("%d번 항목: 구글 뉴스 중계 주소다. 언론사 원문 주소로 바꿔야 한다" % i)
+        if "news.google.com" in url or "search.naver.com" in url:
+            errors.append("%d번 항목: 검색 중계 주소다. 언론사 원문 주소로 바꿔야 한다" % i)
         if url in seen:
             errors.append("%d번 항목: 같은 주소가 두 번 나온다" % i)
         seen.add(url)

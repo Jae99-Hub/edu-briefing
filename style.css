@@ -73,7 +73,7 @@ h1 { margin: 0 0 20px; font-size: clamp(1.45rem, 4.6vw, 2rem); line-height: 1.32
 .tag.blog { background: var(--blog-bg); color: var(--blog-ink); }
 .item h2 { margin: 0 0 8px; font-size: 1.14rem; line-height: 1.42; letter-spacing: -0.02em; }
 .item p { margin: 0 0 10px; }
-.why { color: var(--ink-2); border-left: 3px solid var(--accent); padding-left: 12px; font-size: 0.95rem; }
+.why { color: var(--tag-ink); background: var(--tag-bg); border-radius: 8px; padding: 9px 13px; font-size: 0.95rem; }
 .src { margin: 0; font-size: 0.92rem; }
 .src a { font-weight: 700; display: inline-block; padding: 6px 0; }
 
