@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>교육 브리핑 — 수도권 중학 영어</title>
+<meta name="description" content="수도권 중학교 영어와 교육 정책 소식을 매일 아침 한 화면으로 정리합니다. 모든 항목에 원문 링크가 있습니다.">
+<meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16171a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f4f46'/%3E%3Cpath d='M9 10h14M9 16h14M9 22h9' stroke='%23f6f3ec' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+
+<header class="top">
+  <div class="wrap top-in">
+    <p class="brand">교육 브리핑</p>
+    <p class="scope">수도권 · 중1~중3 영어 · 교육 정책</p>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+  <section class="dayhead" aria-live="polite">
+    <p class="date" id="date">&nbsp;</p>
+    <h1 id="headline">브리핑을 불러오는 중입니다</h1>
+    <nav class="daynav" aria-label="날짜 이동">
+      <button type="button" id="prev" disabled>← 이전 날</button>
+      <label class="pick">
+        <span class="sr">날짜 고르기</span>
+        <select id="dates" disabled></select>
+      </label>
+      <button type="button" id="next" disabled>다음 날 →</button>
+    </nav>
+  </section>
+
+  <div id="list" class="list" aria-busy="true">
+    <!-- 불러오는 동안 보이는 자리 표시 -->
+    <div class="item skel" aria-hidden="true"><span class="bar s"></span><span class="bar l"></span><span class="bar m"></span><span class="bar m"></span></div>
+    <div class="item skel" aria-hidden="true"><span class="bar s"></span><span class="bar l"></span><span class="bar m"></span><span class="bar m"></span></div>
+    <div class="item skel" aria-hidden="true"><span class="bar s"></span><span class="bar l"></span><span class="bar m"></span><span class="bar m"></span></div>
+  </div>
+
+  <p id="note" class="note" hidden></p>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>이 브리핑은 공개된 보도자료와 기사를 자동으로 모아 AI가 요약한 것입니다. 요약에 잘못이 있을 수 있으니 중요한 내용은 반드시 원문에서 확인하세요.</p>
+    <p>"학원가 소식"은 개인 블로그 글을 바탕으로 하며 사실과 다를 수 있습니다. 기사와 자료의 저작권은 각 출처에 있습니다.</p>
+    <p class="small">이 사이트는 방문자 정보를 수집하지 않으며 쿠키와 분석 도구를 쓰지 않습니다.</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
