@@ -4,29 +4,42 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>교육 브리핑 — 수도권 중학 영어</title>
-<meta name="description" content="수도권 중학교 영어와 교육 정책 소식을 매일 아침 한 장씩 넘겨 봅니다. 모든 항목에 원문 링크가 있습니다.">
-<meta name="theme-color" content="#17161b">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2317161b'/%3E%3Cpath d='M9 10h14M9 16h14M9 22h9' stroke='%23edcb5a' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap">
+<meta name="description" content="수도권 중학교 영어와 교육 정책 소식을 매일 아침 카드뉴스로 봅니다. 모든 항목에 원문 링크가 있습니다.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23cc4210'/%3E%3Crect x='7' y='17' width='18' height='7' fill='%23ffe14d'/%3E%3Cpath d='M9 10h14M9 15h10' stroke='%23fff' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<a class="skip" href="#reel">브리핑으로 건너뛰기</a>
+<a class="skip" href="#feed">소식으로 건너뛰기</a>
 
-<main id="reel" class="reel" tabindex="0" aria-label="오늘의 교육 브리핑. 아래로 넘기면 다음 소식이 나옵니다." aria-busy="true">
-  <!-- 불러오는 동안 보이는 자리 표시 -->
-  <section class="page overview" aria-hidden="true">
-    <span class="bar s"></span>
-    <span class="bar xl"></span>
-    <span class="bar xl w70"></span>
-    <div class="tiles"><span class="tile skel"></span><span class="tile skel"></span></div>
-    <span class="bar m"></span><span class="bar m w70"></span>
-  </section>
+<header class="top">
+  <div class="top-in">
+    <a class="logo" href="./" aria-label="교육 브리핑 처음으로">교육<b>브리핑</b></a>
+    <div class="top-r" id="top-r"></div>
+  </div>
+</header>
+
+<main id="feed" class="feed" tabindex="-1" aria-busy="true">
+  <h1 class="sr">오늘의 교육 브리핑</h1>
+  <!-- 불러오는 동안: 스토리와 카드 모양의 자리 표시 -->
+  <div class="stories" aria-hidden="true"><span class="s-skel"></span><span class="s-skel"></span><span class="s-skel"></span><span class="s-skel"></span><span class="s-skel"></span></div>
+  <div class="post" aria-hidden="true">
+    <div class="p-head"><span class="av-skel"></span><span class="line-skel w40"></span></div>
+    <div class="card-skel"></div>
+  </div>
 </main>
 
-<nav id="dots" class="dots" aria-hidden="true"></nav>
+<nav class="tabbar" id="tabbar" aria-label="화면">
+  <button type="button" data-view="today" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fillable" d="M3 10.5L12 3l9 7.5V21h-6v-6H9v6H3z"/></svg><span>오늘</span></button>
+  <button type="button" data-view="days"><svg viewBox="0 0 24 24" aria-hidden="true"><rect class="fillable" x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>지난 소식</span></button>
+  <button type="button" data-view="saved"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fillable" d="M6 3h12v18l-6-5-6 5z"/></svg><span>저장</span></button>
+</nav>
+
+<div class="reels" id="reels" role="dialog" aria-modal="true" aria-label="소식 크게 보기" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="app.js"></script>
 </body>

@@ -47,6 +47,12 @@ def check(path):
             errors.append("%d번 항목: category 는 %s 중 하나여야 한다" % (i, " / ".join(CATEGORIES)))
         if len(str(it.get("summary") or "")) > 400:
             errors.append("%d번 항목: summary 가 400자를 넘는다" % i)
+        card = str(it.get("card_title") or "")
+        key = str(it.get("keyword") or "")
+        if len(card) > 24:
+            errors.append("%d번 항목: card_title 이 24자를 넘는다" % i)
+        if key and key not in (card or str(it.get("title") or "")):
+            errors.append("%d번 항목: keyword 가 card_title 안에 그대로 없다" % i)
     return data, errors
 
 
