@@ -431,7 +431,7 @@
       var url = safeUrl(it.url);
       if (url) {
         var a = el("a"); a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer";
-        a.innerHTML = I.open; a.appendChild(el("span", null, "원문"));
+        a.innerHTML = I.open; a.appendChild(el("span", null, "원문 보기"));
         a.setAttribute("aria-label", "원문 보기 (새 창)");
         side.appendChild(a);
         var s = el("button"); s.type = "button"; s.innerHTML = I.share; s.appendChild(el("span", null, "공유"));
@@ -440,7 +440,7 @@
         side.appendChild(s);
       }
       side.appendChild(saveBtn(it, i, true));
-      side.appendChild(el("span", "n", (n + 1) + "/" + order.length));
+      src.appendChild(el("span", "n", (n + 1) + "/" + order.length));
       low.appendChild(side);
       inn.appendChild(low);
       r.appendChild(inn);
