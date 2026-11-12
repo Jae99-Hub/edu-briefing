@@ -2,6 +2,7 @@
   "use strict";
   var feed = document.getElementById("feed");
   var topR = document.getElementById("top-r");
+  var topL = document.getElementById("top-l");
   var tabbar = document.getElementById("tabbar");
   var reels = document.getElementById("reels");
   var toastEl = document.getElementById("toast");
@@ -26,6 +27,7 @@
     share: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></svg>',
     save: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-5-6 5z"/></svg>',
     cal: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+    back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
     close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
     check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
   };
@@ -34,7 +36,7 @@
   var current = -1;
   var data = null;
   var order = [];
-  var view = "today";
+  var view = "feed";
   var opener = null;
   var reelObs = null;
 
@@ -82,7 +84,7 @@
     toastEl.textContent = msg; toastEl.classList.add("on");
     clearTimeout(toast.t); toast.t = setTimeout(function () { toastEl.classList.remove("on"); }, 1800);
   }
-  function load(k, fb) { try { return JSON.parse(localStorage.getItem(k) || "null") || fb; } catch (e) { return fb; } }
+  function stored(k, fb) { try { return JSON.parse(localStorage.getItem(k) || "null") || fb; } catch (e) { return fb; } }
   function keep(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
   // 카드 제목: 짧은 제목이 있으면 그것, 핵심어나 따옴표 안 낱말에 형광펜
@@ -105,10 +107,10 @@
 
   /* 본 소식 · 저장 (이 기기에만 남는다) */
   function seenKey() { return "eb.seen." + dates[current]; }
-  function getSeen() { return load(seenKey(), []); }
+  function getSeen() { return stored(seenKey(), []); }
   function markSeen(id) { var s = getSeen(); if (s.indexOf(id) < 0) { s.push(id); keep(seenKey(), s); } }
   function itemKey(i) { return dates[current] + "#" + i; }
-  function getSaved() { return load("eb.saved", []); }
+  function getSaved() { return stored("eb.saved", []); }
   function isSaved(key) { return getSaved().some(function (s) { return s.key === key; }); }
   function toggleSave(it, i) {
     var key = itemKey(i);
@@ -145,28 +147,65 @@
     }
   }
 
-  /* 위 막대 오른쪽 */
+  /* 화면 이동: 오늘(최신) · 지난 날 · 지난 소식 목록 · 저장
+     화면을 옮길 때마다 기록을 남겨서 휴대폰의 뒤로 가기와 왼쪽 위 뒤로 버튼이 같은 곳으로 간다 */
+  var LOGO = topL.innerHTML;
+  function depth() { return (history.state && history.state.depth) || 0; }
   function renderTop() {
     topR.textContent = "";
-    if (view !== "today" || !dates.length) return;
-    topR.appendChild(el("span", "daylab", current === 0 ? "오늘" : fmtMD(dates[current])));
-    var c = iconBtn("cal", "지난 소식 고르기");
-    c.addEventListener("click", function () { setView("days"); });
-    topR.appendChild(c);
+    var home = view === "feed" && current === 0;
+    if (home) topL.innerHTML = LOGO;
+    else {
+      topL.textContent = "";
+      var b = iconBtn("back", "뒤로");
+      b.addEventListener("click", goBack);
+      topL.appendChild(b);
+      topL.appendChild(el("span", "top-title", view === "days" ? "지난 소식" : view === "saved" ? "저장한 소식" : fmtShort(dates[current]) + " 소식"));
+    }
+    if (view === "feed" && dates.length) {
+      if (home) topR.appendChild(el("span", "daylab", "오늘"));
+      var c = iconBtn("cal", "지난 소식 고르기");
+      c.addEventListener("click", function () { show("days", current, true); });
+      topR.appendChild(c);
+    }
   }
-
-  function setView(v) {
-    view = v;
-    tabbar.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-current", b.dataset.view === v ? "page" : "false"); });
-    renderTop();
-    if (v === "today") renderFeed();
-    else if (v === "days") renderDays();
-    else renderSaved();
-    window.scrollTo(0, 0);
+  function markTabs() {
+    var tab = view === "saved" ? "saved" : (view === "days" || current > 0) ? "days" : "today";
+    tabbar.querySelectorAll("[data-view]").forEach(function (b) { b.setAttribute("aria-current", b.dataset.view === tab ? "page" : "false"); });
+  }
+  function urlFor(v, d) { return v === "days" ? "?v=days" : v === "saved" ? "?v=saved" : (d > 0 ? "?d=" + dates[d] : location.pathname); }
+  function show(v, d, push) {
+    if (d < 0 || d >= dates.length) return;
+    try {
+      var st = { v: v, d: d, depth: push ? depth() + 1 : depth() };
+      if (push) history.pushState(st, "", urlFor(v, d)); else history.replaceState(st, "", urlFor(v, d));
+    } catch (e) {}
+    function draw() {
+      view = v;
+      markTabs();
+      renderTop();
+      if (v === "feed") renderFeed(); else if (v === "days") renderDays(); else renderSaved();
+      window.scrollTo(0, 0);
+    }
+    if (v === "feed" && (d !== current || !data)) load(d).then(draw, function () {});
+    else draw();
+  }
+  function goBack() {
+    if (depth() > 0) history.back();
+    else show("feed", 0, false);
   }
   tabbar.addEventListener("click", function (e) {
     var b = e.target.closest("button[data-view]");
-    if (b) setView(b.dataset.view);
+    if (!b) return;
+    var v = b.dataset.view;
+    if (v === "today") { if (view === "feed" && current === 0) window.scrollTo({ top: 0, behavior: "smooth" }); else show("feed", 0, true); }
+    else if (v !== view) show(v, current, true);
+  });
+  window.addEventListener("popstate", function (e) {
+    if (!reels.hidden) { closeReels(); return; }
+    var st = e.state || { v: "feed", d: 0 };
+    if (st.reels) { history.back(); return; }
+    show(st.v || "feed", st.d || 0, false);
   });
 
   /* 오늘 화면 */
@@ -383,7 +422,7 @@
     var bar = el("div", "r-bar"), barIn = el("div", "r-bar-in");
     barIn.appendChild(el("span", "ttl", fmtMD(data.date) + " 소식"));
     var x = iconBtn("close", "닫기");
-    x.addEventListener("click", closeReels);
+    x.addEventListener("click", requestClose);
     barIn.appendChild(x);
     bar.appendChild(barIn);
     var track = el("div", "r-track");
@@ -464,7 +503,7 @@
     ck.querySelector("svg").style.cssText = "width:34px;height:34px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round";
     ei.appendChild(ck);
     ei.appendChild(el("h2", "bigt s", "오늘 소식을 모두 봤습니다"));
-    var back = el("button", "btn", "닫기"); back.type = "button"; back.addEventListener("click", closeReels);
+    var back = el("button", "btn", "닫기"); back.type = "button"; back.addEventListener("click", requestClose);
     ei.appendChild(back);
     er.appendChild(ei); track.appendChild(er); list.push(er);
 
@@ -482,10 +521,15 @@
       list.forEach(function (r) { reelObs.observe(r); });
     }
     reels.__track = track; reels.__list = list;
+    reelsPushed = false;
+    try { history.pushState({ v: view, d: current, depth: depth() + 1, reels: true }, "", location.href.split("#")[0]); reelsPushed = true; } catch (e) {}
     document.addEventListener("keydown", onKey);
     x.focus();
   }
+  var reelsPushed = false;
+  function requestClose() { if (reelsPushed) history.back(); else closeReels(); }
   function closeReels() {
+    reelsPushed = false;
     if (reelObs) reelObs.disconnect();
     reels.hidden = true;
     reels.textContent = "";
@@ -496,7 +540,7 @@
   }
   function onKey(e) {
     var tr = reels.__track, list = reels.__list;
-    if (e.key === "Escape") { e.preventDefault(); closeReels(); return; }
+    if (e.key === "Escape") { e.preventDefault(); requestClose(); return; }
     if (!tr) return;
     var at = Math.round(tr.scrollTop / tr.clientHeight);
     if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === "j") { e.preventDefault(); if (list[at + 1]) tr.scrollTo({ top: list[at + 1].offsetTop, behavior: "smooth" }); }
@@ -528,28 +572,30 @@
     if (body) e.appendChild(document.createTextNode(body));
     feed.appendChild(e);
   }
-  function go(i) {
-    if (i < 0 || i >= dates.length) return;
+  function load(i) {
     current = i;
     feed.setAttribute("aria-busy", "true");
-    getJSON("briefings/" + dates[i] + ".json").then(function (d) {
-      if (current !== i) return;
+    return getJSON("briefings/" + dates[i] + ".json").then(function (d) {
+      if (current !== i) throw new Error("stale");
       data = d;
-      setView("today");
-      if (location.hash === "#reels") openReels(1);
-      try { history.replaceState(null, "", i === 0 ? location.pathname : "?d=" + dates[i]); } catch (e) {}
-    }).catch(function () {
-      if (current !== i) return;
-      message("이 날짜의 브리핑을 불러오지 못했습니다", "잠시 뒤 다시 열어 보세요.");
+    }).catch(function (err) {
+      if (current === i) message("이 날짜의 브리핑을 불러오지 못했습니다", "잠시 뒤 다시 열어 보세요.");
+      throw err;
     });
   }
+  function go(i) { show("feed", i, true); }
 
   getJSON("briefings/index.json").then(function (index) {
     dates = (index.dates || []).filter(function (d) { return /^\d{4}-\d{2}-\d{2}$/.test(d); });
     if (!dates.length) { message("아직 브리핑이 없습니다", "첫 브리핑은 다음 날 아침 7시쯤 올라옵니다."); return; }
-    var want = new URLSearchParams(location.search).get("d");
-    var start = dates.indexOf(want);
-    go(start >= 0 ? start : 0);
+    var q = new URLSearchParams(location.search);
+    var start = Math.max(0, dates.indexOf(q.get("d")));
+    var v = q.get("v") === "days" || q.get("v") === "saved" ? q.get("v") : "feed";
+    var deep = location.hash === "#reels";
+    load(start).then(function () {
+      show(v, start, false);
+      if (deep && v === "feed") openReels(1);
+    }, function () {});
   }).catch(function () {
     message("브리핑 목록을 불러오지 못했습니다", "인터넷 연결을 확인하고 새로 고침해 주세요.");
   });

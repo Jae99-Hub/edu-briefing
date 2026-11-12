@@ -37,6 +37,9 @@ mark { background: var(--mk, var(--marker)); color: var(--marker-ink); padding: 
 .logo { font-size: 23px; font-weight: 800; letter-spacing: -0.045em; text-decoration: none; }
 .logo b { color: var(--brand); font-weight: 800; }
 @media (prefers-color-scheme: dark) { .logo b { color: #ff7a45; } }
+.top-l { display: flex; align-items: center; gap: 2px; min-width: 0; margin-left: -10px; }
+.top-l .logo { margin-left: 10px; }
+.top-title { font-size: 18px; font-weight: 800; letter-spacing: -0.03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .top-r { display: flex; align-items: center; gap: 4px; }
 .icon-btn { width: 44px; height: 44px; border: 0; background: none; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: transform .1s, background .15s; }
 .icon-btn:hover { background: var(--raised); }
@@ -72,7 +75,7 @@ mark { background: var(--mk, var(--marker)); color: var(--marker-ink); padding: 
 .track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
 .track::-webkit-scrollbar { display: none; }
 .slide { flex: none; width: 100%; aspect-ratio: 4 / 5; max-height: 600px; scroll-snap-align: start; padding: 22px 22px 20px; display: flex; flex-direction: column; background: var(--c); color: var(--c-ink); position: relative; border: 0; text-align: left; font: inherit; cursor: pointer; }
-.slide .tag { align-self: flex-start; font-size: 13px; font-weight: 800; padding: 6px 10px; border-radius: 4px; background: #111; color: #fff; }
+.slide .tag { align-self: flex-start; font-size: 13px; font-weight: 800; padding: 6px 10px; border-radius: 4px; background: var(--c-ink); color: var(--c); }
 .slide .pg { position: absolute; top: 18px; right: 16px; font-size: 12px; font-weight: 700; background: rgba(0,0,0,.45); color: #fff; padding: 4px 9px; border-radius: 12px; }
 .slide h2 { margin: auto 0 0; font-weight: 800; letter-spacing: -0.045em; line-height: 1.2; }
 .slide h2.l { font-size: clamp(34px, 10.2vw, 42px); }
@@ -124,11 +127,11 @@ mark { background: var(--mk, var(--marker)); color: var(--marker-ink); padding: 
 
 /* 아래 탭 막대 */
 .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--ground); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); display: flex; justify-content: center; }
-.tabbar button { flex: 1; max-width: 160px; height: var(--tab-h); border: 0; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11px; font-weight: 600; color: var(--muted); }
+.tabbar button, .tabbar a { flex: 1; text-decoration: none; max-width: 160px; height: var(--tab-h); border: 0; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11px; font-weight: 600; color: var(--muted); }
 .tabbar button[aria-current="page"] { color: var(--text); }
 .tabbar svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .tabbar button[aria-current="page"] .fillable { fill: currentColor; }
-.tabbar button:active svg { transform: scale(.9); }
+.tabbar button:active svg, .tabbar a:active svg { transform: scale(.9); }
 
 /* 릴스 보기: 세로로 한 장씩 */
 .reels { position: fixed; inset: 0; z-index: 50; background: #000; color: #fff; }
