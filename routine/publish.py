@@ -84,6 +84,16 @@ def main():
     dates = set(index.get("dates", []))
     dates.add(data["date"])
     index["dates"] = sorted(dates, reverse=True)
+    # 지난 소식 목록에 보여 줄 날짜별 한 줄 요약과 건수
+    days = []
+    for d in index["dates"]:
+        try:
+            with open(os.path.join(ROOT, "briefings", d + ".json"), encoding="utf-8") as f:
+                b = json.load(f)
+            days.append({"date": d, "headline": str(b.get("headline") or ""), "count": len(b.get("items") or [])})
+        except Exception:
+            days.append({"date": d})
+    index["days"] = days
     with open(index_path, "w", encoding="utf-8", newline="\n") as f:
         json.dump(index, f, ensure_ascii=False, indent=1)
         f.write("\n")

@@ -38,7 +38,7 @@
   var order = [];
   var view = "feed";
   var opener = null;
-  var reelObs = null;
+  var days = {};
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -105,10 +105,7 @@
     return node;
   }
 
-  /* 본 소식 · 저장 (이 기기에만 남는다) */
-  function seenKey() { return "eb.seen." + dates[current]; }
-  function getSeen() { return stored(seenKey(), []); }
-  function markSeen(id) { var s = getSeen(); if (s.indexOf(id) < 0) { s.push(id); keep(seenKey(), s); } }
+  /* 저장 (이 기기에만 남는다) */
   function itemKey(i) { return dates[current] + "#" + i; }
   function getSaved() { return stored("eb.saved", []); }
   function isSaved(key) { return getSaved().some(function (s) { return s.key === key; }); }
@@ -118,7 +115,7 @@
     var at = list.findIndex(function (s) { return s.key === key; });
     if (at >= 0) { list.splice(at, 1); toast("저장을 취소했습니다"); }
     else {
-      list.unshift({ key: key, date: dates[current], category: it.category, title: it.title, card_title: it.card_title || "", source: it.source, url: it.url });
+      list.unshift({ key: key, date: dates[current], category: it.category, title: it.title, card_title: it.card_title || "", keyword: it.keyword || "", why: it.why || "", source: it.source, url: it.url, published: it.published || "" });
       toast("저장했습니다");
     }
     keep("eb.saved", list);
@@ -160,10 +157,9 @@
       var b = iconBtn("back", "뒤로");
       b.addEventListener("click", goBack);
       topL.appendChild(b);
-      topL.appendChild(el("span", "top-title", view === "days" ? "지난 소식" : view === "saved" ? "저장한 소식" : fmtShort(dates[current]) + " 소식"));
+      if (view === "feed") topL.appendChild(el("span", "top-title", "지난 소식"));
     }
     if (view === "feed" && dates.length) {
-      if (home && data && data.date === todayKST()) topR.appendChild(el("span", "daylab", "오늘"));
       var c = iconBtn("cal", "지난 소식 고르기");
       c.addEventListener("click", function () { show("days", current, true); });
       topR.appendChild(c);
@@ -208,7 +204,8 @@
     show(st.v || "feed", st.d || 0, false);
   });
 
-  /* 오늘 화면 */
+  /* 오늘 화면: 날짜 → 으뜸 소식 카드 하나 → 나머지 소식 줄. 한 화면에서 그날 브리핑을 다 훑는다 */
+  function todayKST() { return new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10); }
   function renderFeed() {
     if (!data) return;
     var items = Array.isArray(data.items) ? data.items : [];
@@ -216,191 +213,97 @@
     ORDER.concat(items.map(function (it) { return it.category; })).forEach(function (c) {
       items.forEach(function (it, i) { if (it.category === c && order.indexOf(i) < 0) order.push(i); });
     });
-    var seen = getSeen();
     feed.textContent = "";
     feed.setAttribute("aria-busy", "false");
     document.title = "교육 브리핑 — " + fmtShort(data.date);
-
-    var row = el("nav", "stories");
-    row.setAttribute("aria-label", "분야별로 크게 보기");
-    row.appendChild(story("요약", "오늘 요약", "today", seen.indexOf("today") >= 0, "학원 운영", 0));
-    var cats = [];
-    order.forEach(function (i) { if (cats.indexOf(items[i].category) < 0) cats.push(items[i].category); });
-    cats.forEach(function (c) {
-      var idx = order.filter(function (i) { return items[i].category === c; });
-      var allSeen = idx.every(function (i) { return seen.indexOf("i" + i) >= 0; });
-      row.appendChild(story(SHORT[c] || c.slice(0, 2), LABEL[c] || c, c, allSeen, c, 1 + order.indexOf(idx[0])));
-    });
-    feed.appendChild(row);
-    feed.appendChild(digest(items));
-
+    feed.appendChild(masthead(items));
     if (!items.length) {
       var e = el("div", "empty-note");
       e.appendChild(el("b", null, "오늘은 새 소식이 없습니다"));
       e.appendChild(document.createTextNode(data.note || ""));
       feed.appendChild(e);
+    } else {
+      feed.appendChild(lead(items[order[0]]));
+      if (order.length > 1) {
+        var ol = el("ol", "d-list");
+        order.slice(1).forEach(function (i, k) {
+          var li = el("li");
+          var b = row(items[i], "button", data.date);
+          b.setAttribute("aria-label", (LABEL[items[i].category] || items[i].category || "소식") + ": " + items[i].title + ". 크게 보기");
+          b.addEventListener("click", function () { openReels(2 + k, b); });
+          li.appendChild(b);
+          ol.appendChild(li);
+        });
+        feed.appendChild(ol);
+      }
     }
-    if (items.length) feed.appendChild(el("h2", "sec-h", "카드로 보기"));
-    order.forEach(function (i, n) { feed.appendChild(post(items[i], i, n)); });
     feed.appendChild(caught(items));
   }
 
-  /* 한눈에 보기: 날짜, 건수, 소식마다 제목과 확인할 것. 한 화면에서 그날 브리핑을 다 훑는다 */
-  function todayKST() { return new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10); }
-  function digest(items) {
-    var sec = el("section", "digest");
+  function masthead(items) {
+    var sec = el("header", "mast");
     var p = parts(data.date);
-    var h = el("h1", "d-date", p.m + "월 " + p.d + "일 " + p.w + "요일");
+    var h = el("h1", null, p.m + "월 " + p.d + "일 " + p.w + "요일");
     h.appendChild(el("span", "sr", " 교육 브리핑"));
     sec.appendChild(h);
     var todos = items.filter(function (it) { return (it.why || "").trim(); }).length;
-    sec.appendChild(el("p", "d-count", items.length ? "소식 " + items.length + "건" + (todos ? " · 확인할 일 " + todos + "가지" : "") : "새 소식 없음"));
+    sec.appendChild(el("p", "count", items.length ? "소식 " + items.length + "건" + (todos ? " · 확인할 일 " + todos + "가지" : "") : "새 소식 없음"));
     if (current === 0 && data.date < todayKST()) {
-      sec.appendChild(el("p", "d-stale", "오늘 브리핑은 아직 올라오지 않았습니다. 보통 아침 7시쯤 올라옵니다. 아래는 " + fmtMD(data.date) + " 소식입니다."));
+      sec.appendChild(el("p", "stale", "오늘 브리핑은 아직 올라오지 않았습니다. 보통 아침 7시쯤 올라옵니다. 아래는 " + fmtMD(data.date) + " 소식입니다."));
     }
-    if (!items.length) return sec;
-    var ol = el("ol", "d-list");
-    order.forEach(function (i, n) {
-      var it = items[i];
-      var li = el("li");
-      var b = paint(el("button", "d-row"), it.category);
-      b.type = "button";
-      b.appendChild(el("span", "d-cat", SHORT[it.category] || (it.category || "소식").slice(0, 2)));
-      var t = el("span", "d-txt");
-      t.appendChild(el("b", null, cardTitle(it)));
-      if ((it.why || "").trim()) {
-        var w = el("span", "d-why");
-        w.appendChild(el("i", null, "확인"));
-        w.appendChild(document.createTextNode(it.why));
-        t.appendChild(w);
-      }
-      b.appendChild(t);
-      b.setAttribute("aria-label", (LABEL[it.category] || it.category || "소식") + ": " + it.title + ". 크게 보기");
-      b.addEventListener("click", function () { openReels(1 + n, b); });
-      li.appendChild(b);
-      ol.appendChild(li);
-    });
-    sec.appendChild(ol);
     return sec;
   }
-
-  function story(text, label, cat, seen, colorOf, at) {
-    var b = el("button", "story" + (seen ? " seen" : ""));
+  function byline(it, today) {
+    var w = it.published ? (today ? when(it.published, today) : fmtMD(it.published)) : "";
+    return (it.source || "출처 미상") + (w ? " · " + w : "");
+  }
+  function whyLine(it, cls) {
+    var w = el("p", cls);
+    w.appendChild(el("i", null, "확인"));
+    w.appendChild(document.createTextNode(it.why));
+    return w;
+  }
+  // 으뜸 소식: 그날 맨 앞 소식을 분야 색 카드로 크게
+  function lead(it) {
+    var b = paint(el("button", "lead"), it.category);
     b.type = "button";
-    b.setAttribute("data-cat", cat);
-    b.setAttribute("aria-label", label + " 크게 보기");
-    var ring = el("span", "ring"), inner = el("span", "in", text);
-    ring.appendChild(inner);
-    b.appendChild(ring);
-    b.appendChild(el("span", "lab", label));
-    if (cat === "today") { b.style.setProperty("--c", "#111111"); b.style.setProperty("--c-ink", "#ffffff"); }
-    else paint(b, colorOf);
-    b.addEventListener("click", function () { openReels(at, b); });
+    b.setAttribute("aria-label", (LABEL[it.category] || it.category || "소식") + ": " + it.title + ". 크게 보기");
+    var top = el("span", "l-top");
+    top.appendChild(el("span", "tag", it.category || "소식"));
+    top.appendChild(el("span", "by", byline(it, data.date)));
+    b.appendChild(top);
+    b.appendChild(marked(el("h2", cardTitle(it).length <= 24 ? "l" : "s"), it));
+    if ((it.why || "").trim()) b.appendChild(whyLine(it, "l-why"));
+    b.addEventListener("click", function () { openReels(1, b); });
+    return b;
+  }
+  // 소식 한 줄: 분야 색 칸, 제목(핵심어 형광펜), 출처, 확인할 것. 오늘 화면과 저장 목록이 함께 쓴다
+  function row(it, tag, today) {
+    var b = paint(el(tag, "d-row"), it.category);
+    if (tag === "button") b.type = "button";
+    b.appendChild(el("span", "d-cat", SHORT[it.category] || (it.category || "소식").slice(0, 2)));
+    var t = el("span", "d-txt");
+    t.appendChild(marked(el("b"), it));
+    t.appendChild(el("span", "d-by", byline(it, today)));
+    if ((it.why || "").trim()) t.appendChild(whyLine(it, "d-why"));
+    b.appendChild(t);
     return b;
   }
 
-  function post(it, i, n) {
-    var art = paint(el("article", "post"), it.category);
-    art.setAttribute("aria-labelledby", "t" + i);
-    var head = el("div", "p-head");
-    head.appendChild(el("span", "av", initial(it.source)));
-    var who = el("div", "who");
-    who.appendChild(el("b", null, it.source || "출처 미상"));
-    who.appendChild(el("span", null, (LABEL[it.category] || it.category || "소식") + (it.published ? " · " + when(it.published, data.date) : "")));
-    head.appendChild(who);
-    art.appendChild(head);
-
-    var url = safeUrl(it.url);
-    var hasTodo = !!(it.why || "").trim();
-    var total = hasTodo ? 2 : 1;
-    var car = el("div", "carousel");
-    var track = el("div", "track");
-    var cover = el("button", "slide");
-    cover.type = "button";
-    cover.setAttribute("aria-label", "크게 보기: " + it.title);
-    cover.appendChild(el("span", "tag", it.category || "소식"));
-    if (total > 1) cover.appendChild(el("span", "pg", "1/" + total));
-    var h = marked(el("h2", sizeClass(cardTitle(it))), it);
-    h.id = "t" + i;
-    cover.appendChild(h);
-    var foot = el("span", "foot");
-    foot.appendChild(el("span", null, (it.source || "") + (it.published ? " · " + fmtMD(it.published) : "")));
-    if (total > 1) foot.appendChild(el("span", null, "옆으로 넘겨 보기 →"));
-    cover.appendChild(foot);
-    cover.addEventListener("click", function () { openReels(1 + n, cover); });
-    track.appendChild(cover);
-    if (hasTodo) {
-      var todo = el("div", "slide todo");
-      todo.appendChild(el("span", "pg", "2/2"));
-      todo.appendChild(el("span", "lab", "확인할 것"));
-      todo.appendChild(el("p", null, it.why));
-      if (url) { var go = el("a", "go", "원문 보기"); go.href = url; go.target = "_blank"; go.rel = "noopener noreferrer"; go.setAttribute("aria-label", "원문 보기 (새 창): " + it.title); todo.appendChild(go); }
-      track.appendChild(todo);
-    }
-    car.appendChild(track);
-    art.appendChild(car);
-
-    var acts = el("div", "acts acts-wrap");
-    if (url) {
-      var a = iconBtn("open", "원문 보기 (새 창)", "a");
-      a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer";
-      acts.appendChild(a);
-      var s = iconBtn("share", "원문 링크 보내기");
-      s.addEventListener("click", function () { share(it); });
-      acts.appendChild(s);
-    }
-    if (total > 1) {
-      var dots = el("span", "dots");
-      dots.setAttribute("aria-hidden", "true");
-      for (var k = 0; k < total; k++) dots.appendChild(el("i", k === 0 ? "on" : ""));
-      acts.appendChild(dots);
-      track.addEventListener("scroll", function () {
-        var at = Math.round(track.scrollLeft / track.clientWidth);
-        dots.querySelectorAll("i").forEach(function (d, j) { d.className = j === at ? "on" : ""; });
-      }, { passive: true });
-    }
-    var sb = saveBtn(it, i, false);
-    sb.classList.add("end");
-    acts.appendChild(sb);
-    art.appendChild(acts);
-
-    var cap = el("p", "cap");
-    cap.appendChild(el("b", null, it.source || ""));
-    cap.appendChild(el("span", "txt", it.summary || ""));
-    art.appendChild(cap);
-    if ((it.summary || "").length > 60) {
-      cap.classList.add("clamp");
-      var more = el("button", "more", "더 보기");
-      more.type = "button";
-      more.setAttribute("aria-expanded", "false");
-      more.addEventListener("click", function () {
-        var closed = cap.classList.toggle("clamp");
-        more.textContent = closed ? "더 보기" : "접기";
-        more.setAttribute("aria-expanded", String(!closed));
-      });
-      art.appendChild(more);
-    }
-    if (it.published) art.appendChild(el("span", "when", "보도 " + fmtShort(it.published)));
-    return art;
-  }
-
   function caught(items) {
-    var sec = el("section", "caught");
-    sec.setAttribute("aria-labelledby", "caught-h");
-    var c = el("span", "check"); c.innerHTML = I.check; sec.appendChild(c);
-    var h = el("h2", null, items.length ? "오늘 소식을 모두 봤습니다" : "오늘은 여기까지입니다");
-    h.id = "caught-h"; sec.appendChild(h);
+    var sec = el("footer", "foot");
     var notes = [];
     if (data.note && items.length) notes.push(data.note);
     if (Array.isArray(data.sources_failed) && data.sources_failed.length) notes.push("이번에 읽지 못한 출처: " + data.sources_failed.join(", "));
-    if (notes.length) sec.appendChild(el("p", null, notes.join(" ")));
-    var prev = el("button", "btn", "전날 소식 보기");
-    prev.type = "button";
-    prev.disabled = current >= dates.length - 1;
-    prev.addEventListener("click", function () { go(current + 1); });
-    sec.appendChild(prev);
+    if (notes.length) sec.appendChild(el("p", "note", notes.join(" ")));
+    if (current < dates.length - 1) {
+      var prev = el("button", "btn", "전날 소식 보기");
+      prev.type = "button";
+      prev.addEventListener("click", function () { go(current + 1); });
+      sec.appendChild(prev);
+    }
     sec.appendChild(el("p", "fine", "공개된 보도자료와 기사를 자동으로 모아 AI가 요약했습니다. 요약에 잘못이 있을 수 있으니 중요한 내용은 원문에서 확인하세요. \"학원가 소식\"은 개인 블로그 글을 바탕으로 하며 사실과 다를 수 있습니다. 기사와 자료의 저작권은 각 출처에 있습니다."));
-    sec.appendChild(el("p", "fine", "방문자 정보와 쿠키를 쓰지 않습니다. 본 소식과 저장 목록은 이 기기에만 남습니다. 글꼴만 jsDelivr에서 불러옵니다."));
+    sec.appendChild(el("p", "fine", "방문자 정보와 쿠키를 쓰지 않습니다. 저장 목록은 이 기기에만 남습니다. 글꼴만 jsDelivr에서 불러옵니다."));
     return sec;
   }
 
@@ -417,7 +320,10 @@
       b.appendChild(el("span", "thumb day", String(p.d)));
       var t = el("span", "t");
       t.appendChild(el("b", null, p.m + "월 " + p.d + "일 " + p.w + "요일"));
-      t.appendChild(el("span", null, k === 0 ? "가장 최근 브리핑" : (k === current ? "지금 보는 날" : "")));
+      var info = days[d] || {};
+      var sub = info.headline || (k === 0 ? "가장 최근 브리핑" : "");
+      if (sub) t.appendChild(el("span", "sub", sub));
+      if (typeof info.count === "number") t.appendChild(el("span", "n", info.count ? "소식 " + info.count + "건" : "새 소식 없음"));
       b.appendChild(t);
       b.addEventListener("click", function () { go(k); });
       rows.appendChild(b);
@@ -437,20 +343,25 @@
       feed.appendChild(e);
       return;
     }
-    var rows = el("div", "rows");
+    var ol = el("ol", "d-list");
     list.forEach(function (s) {
       var url = safeUrl(s.url);
-      var a = el(url ? "a" : "div", "row");
-      if (url) { a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer"; }
-      paint(a, s.category);
-      a.appendChild(el("span", "thumb", (s.card_title || s.title || "").slice(0, 22)));
-      var t = el("span", "t");
-      t.appendChild(el("b", null, s.title));
-      t.appendChild(el("span", null, (s.source || "") + " · " + fmtMD(s.date)));
-      a.appendChild(t);
-      rows.appendChild(a);
+      var li = el("li");
+      var a = row(s, url ? "a" : "div", null);
+      if (url) { a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer"; a.setAttribute("aria-label", "원문 보기 (새 창): " + s.title); }
+      a.querySelector(".d-by").textContent += (s.published ? " 보도" : "") + " · " + fmtMD(s.date) + " 브리핑";
+      li.appendChild(a);
+      var x = iconBtn("close", "저장 취소: " + s.title);
+      x.classList.add("unsave");
+      x.addEventListener("click", function () {
+        keep("eb.saved", getSaved().filter(function (o) { return o.key !== s.key; }));
+        toast("저장을 취소했습니다");
+        renderSaved();
+      });
+      li.appendChild(x);
+      ol.appendChild(li);
     });
-    feed.appendChild(rows);
+    feed.appendChild(ol);
   }
 
   /* 릴스: 요약 → 소식 → 끝 */
@@ -553,13 +464,6 @@
     document.body.style.overflow = "hidden";
     var target = list[Math.max(0, Math.min(at, list.length - 1))];
     track.scrollTop = target.offsetTop;
-    if (reelObs) reelObs.disconnect();
-    if ("IntersectionObserver" in window) {
-      reelObs = new IntersectionObserver(function (es) {
-        es.forEach(function (e) { if (e.isIntersecting && e.target.dataset.id !== "end") markSeen(e.target.dataset.id); });
-      }, { root: track, threshold: 0.6 });
-      list.forEach(function (r) { reelObs.observe(r); });
-    }
     reels.__track = track; reels.__list = list;
     reelsPushed = false;
     try { history.pushState({ v: view, d: current, depth: depth() + 1, reels: true }, "", location.href.split("#")[0]); reelsPushed = true; } catch (e) {}
@@ -570,12 +474,10 @@
   function requestClose() { if (reelsPushed) history.back(); else closeReels(); }
   function closeReels() {
     reelsPushed = false;
-    if (reelObs) reelObs.disconnect();
     reels.hidden = true;
     reels.textContent = "";
     document.body.style.overflow = "";
     document.removeEventListener("keydown", onKey);
-    refreshSeen();
     if (opener && opener.isConnected) opener.focus();
   }
   function onKey(e) {
@@ -592,17 +494,6 @@
       else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
     }
   }
-  function refreshSeen() {
-    var items = (data && data.items) || [];
-    var seen = getSeen();
-    feed.querySelectorAll(".story").forEach(function (b) {
-      var c = b.getAttribute("data-cat");
-      var done = c === "today" ? seen.indexOf("today") >= 0
-        : items.every(function (it, i) { return it.category !== c || seen.indexOf("i" + i) >= 0; });
-      b.classList.toggle("seen", done);
-    });
-  }
-
   /* 불러오기 */
   function message(title, body) {
     feed.textContent = "";
@@ -627,6 +518,7 @@
 
   getJSON("briefings/index.json").then(function (index) {
     dates = (index.dates || []).filter(function (d) { return /^\d{4}-\d{2}-\d{2}$/.test(d); });
+    (Array.isArray(index.days) ? index.days : []).forEach(function (x) { if (x && x.date) days[x.date] = x; });
     if (!dates.length) { message("아직 브리핑이 없습니다", "첫 브리핑은 다음 날 아침 7시쯤 올라옵니다."); return; }
     var q = new URLSearchParams(location.search);
     var start = Math.max(0, dates.indexOf(q.get("d")));
