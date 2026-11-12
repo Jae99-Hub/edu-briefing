@@ -239,6 +239,28 @@ footer p { margin: 0 0 4px; }
 .skel { display: block; border-radius: 8px; background: var(--raised); animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity: .55; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+/* 인스타 탐색 탭처럼: 색 격자 */
+.explore { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
+@media (min-width: 735px) { .explore { gap: 4px; margin: 0; } }
+.xt { aspect-ratio: 4 / 5; max-width: 100%; border: 0; padding: 10px; background: var(--c); color: var(--c-ink); text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; overflow: hidden; font: inherit; transition: filter .15s, transform .1s; }
+.xt:hover { filter: brightness(1.06); }
+.xt:active { transform: scale(.98); }
+.xt .nm { font-size: clamp(19px, 5.8vw, 28px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; word-break: keep-all; }
+.xt .sub { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; font-size: 12px; font-weight: 700; line-height: 1.25; min-width: 0; max-width: 100%; }
+.xt mark { background: var(--mk); color: #111111; padding: 1px 4px; font-size: 11.5px; font-weight: 800; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xt .meta { opacity: .9; }
+.group { margin: 22px 0 8px; }
+.count { padding: 4px 0 8px; }
+/* 지역: 색 스토리 동그라미, 고른 지역만 테두리에 색 */
+.region .ring { background: var(--raised-2); padding: 2px; }
+.region .bubble { background: var(--c); color: var(--c-ink); }
+.region[aria-pressed="true"] .ring { background: var(--c); padding: 3px; }
+.region[aria-pressed="true"] .bubble { background: var(--c); color: var(--c-ink); }
+.region[aria-pressed="true"] .lab { font-weight: 800; }
+/* 위쪽 학교 · 교과서 전환: 글자 탭 */
+.views { background: none; padding: 0; gap: 16px; }
+.views a { padding: 0 2px; min-height: 44px; border-radius: 0; font-size: 16px; font-weight: 700; color: var(--muted); }
+.views a[aria-current="page"] { background: none; color: var(--text); box-shadow: inset 0 -2px 0 var(--text); }
 /* 아래 탭 막대: 브리핑 화면과 같은 모양 */
 .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--ground); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom, 0px); display: flex; justify-content: center; }
 .tabbar a { flex: 1; max-width: 160px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11px; font-weight: 600; color: var(--muted); text-decoration: none; }
@@ -309,6 +331,17 @@ footer p { margin: 0 0 4px; }
 
   // 단원 칸 색 [바탕, 글자, 형광펜] — 브리핑 카드와 같은 색
   var PALETTE = [["#cc4210", "#ffffff", "#ffe14d"], ["#0b7a6b", "#ffffff", "#ffe14d"], ["#1659e6", "#ffffff", "#ffe14d"], ["#ffd23f", "#111111", "#ffffff"], ["#d6336c", "#ffffff", "#ffe14d"], ["#3d6b21", "#ffffff", "#ffe14d"], ["#111111", "#ffffff", "#ffe14d"]];
+  var REGIONC = { "경기 수원": PALETTE[2], "경기 오산": PALETTE[0], "경기 용인": PALETTE[1], "경기 화성": PALETTE[4] };
+  function pubColor(pub) {
+    pub = pub || "";
+    if (/동아/.test(pub)) return PALETTE[0];
+    if (/천재/.test(pub)) return PALETTE[2];
+    if (/능률|NE/.test(pub)) return PALETTE[1];
+    if (/YBM|와이비엠/.test(pub)) return PALETTE[4];
+    if (/미래엔/.test(pub)) return PALETTE[5];
+    if (/지학사/.test(pub)) return PALETTE[3];
+    return PALETTE[6];
+  }
   var GRADE = { "1": PALETTE[0], "2": PALETTE[1], "3": PALETTE[2] };
   function paint(node, c) { node.style.setProperty("--c", c[0]); node.style.setProperty("--c-ink", c[1]); node.style.setProperty("--mk", c[2]); return node; }
   function el(tag, cls, text) {
@@ -394,7 +427,7 @@ footer p { margin: 0 0 4px; }
     rr.setAttribute("aria-label", "지역");
     regions.forEach(function (r) {
       var n = DATA.schools.filter(function (s) { return s.region === r; }).length;
-      var b = el("button", "region");
+      var b = paint(el("button", "region"), REGIONC[r] || PALETTE[6]);
       b.type = "button";
       b.setAttribute("aria-pressed", String(r === state.region));
       b.setAttribute("aria-label", regionShort(r) + " 학교 " + n + "곳");
@@ -422,19 +455,22 @@ footer p { margin: 0 0 4px; }
       });
       rows.appendChild(el("div", "count", q ? "검색 결과 " + list.length + "곳" : regionShort(state.region) + " 중학교 " + list.length + "곳"));
       if (!list.length) { var e = el("div", "empty"); e.appendChild(el("b", null, "찾는 학교가 없습니다")); e.appendChild(el("span", null, "학교 이름 일부만 넣어 보세요. 예: 동탄, 광교")); rows.appendChild(e); }
+      var grid = el("div", "explore");
       list.forEach(function (i) {
         var s = DATA.schools[i];
-        var b = el("button", "row"); b.type = "button";
-        b.appendChild(el("span", "avatar", monogram(s.school)));
-        var t = el("span", "r-txt");
-        t.appendChild(el("span", "r-name", shortSchool(s.school)));
         var y = s.years["2026"] || s.years[Object.keys(s.years).sort()[0]] || {};
         var g1 = y["1"];
-        t.appendChild(el("span", "r-sub", regionShort(s.region) + (g1 ? " · 중1 " + shortPub(g1.publisher) + " " + g1.author : "")));
-        b.appendChild(t);
+        var b = paint(el("button", "xt"), pubColor(g1 && g1.publisher)); b.type = "button";
+        b.setAttribute("aria-label", s.school + (g1 ? ", 중1 " + g1.publisher + " " + g1.author : ""));
+        b.appendChild(el("span", "nm", shortSchool(s.school)));
+        var sub = el("span", "sub");
+        if (q) sub.appendChild(el("span", "meta", regionShort(s.region)));
+        if (g1) sub.appendChild(el("mark", null, "중1 " + shortPub(g1.publisher) + " " + g1.author));
+        b.appendChild(sub);
         b.addEventListener("click", function () { openSchool(i); });
-        rows.appendChild(b);
+        grid.appendChild(b);
       });
+      if (list.length) rows.appendChild(grid);
     }
     inp.addEventListener("input", function () { state.q = inp.value; fill(); });
     fill();
@@ -693,21 +729,22 @@ footer p { margin: 0 0 4px; }
     function fill() {
       rows.textContent = "";
       var q = state.bq.replace(/\s/g, "");
-      var last = "";
+      var last = "", grid = null;
       var shown = keys.filter(function (k) { return !q || k.replace(/[\s|]/g, "").indexOf(q) >= 0 || shortPub(k.split("|")[0]).indexOf(q) >= 0; });
       shown.forEach(function (k) {
         var p = k.split("|");
         var grp = p[2] + " 개정 · 중" + p[3];
-        if (grp !== last) { rows.appendChild(el("h2", "group", grp)); last = grp; }
+        if (grp !== last) { rows.appendChild(el("h2", "group", grp)); grid = el("div", "explore"); rows.appendChild(grid); last = grp; }
         var b = DATA.books[k];
-        var r = el("button", "row"); r.type = "button";
-        r.appendChild(el("span", "avatar" + (b ? " pri" : ""), monogram(p[0])));
-        var t = el("span", "r-txt");
-        t.appendChild(el("span", "r-name", shortPub(p[0]) + " " + p[1] + " · 영어 " + p[3]));
-        t.appendChild(el("span", "r-sub", "학교 " + usedCount(k) + "곳 · " + (b ? (b.verified ? "단원 원문 확인" : "단원 2차 자료") : "단원 정리 전")));
+        var r = paint(el("button", "xt"), pubColor(p[0])); r.type = "button";
+        r.setAttribute("aria-label", p[0] + " " + p[1] + " 영어 " + p[3] + ", 학교 " + usedCount(k) + "곳");
+        r.appendChild(el("span", "nm", shortPub(p[0]) + " " + p[1]));
+        var t = el("span", "sub");
+        t.appendChild(el("mark", null, "영어 " + p[3] + (b ? "" : " · 단원 정리 전")));
+        t.appendChild(el("span", "meta", "학교 " + usedCount(k) + "곳"));
         r.appendChild(t);
         r.addEventListener("click", function () { state.tab = "grid"; nav("#b-" + ALLKEYS.indexOf(k)); });
-        rows.appendChild(r);
+        grid.appendChild(r);
       });
       if (!shown.length) { var e = el("div", "empty"); e.appendChild(el("b", null, "맞는 교과서가 없습니다")); rows.appendChild(e); }
     }
@@ -796,7 +833,7 @@ footer p { margin: 0 0 4px; }
     state.region = recall("region");
     var t = recall("tab"); if (t) state.tab = t;
     var code = recall("school");
-    if (code && !/^#(s-\d+|books)$/.test(location.hash)) {
+    if (code && !/^#(s-\d+|b-\d+|books|schools)/.test(location.hash)) {
       var i = d.schools.findIndex(function (s) { return s.code === code; });
       if (i >= 0) { state.region = d.schools[i].region; try { history.replaceState(null, "", "#s-" + code); } catch (e) {} }
     }
