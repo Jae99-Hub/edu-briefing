@@ -20,7 +20,9 @@ import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from recent import norm_url, recent_items
+
+ROOT =os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KST = dt.timezone(dt.timedelta(hours=9))
 UA = "Mozilla/5.0 (compatible; edu-briefing/1.0)"
 
@@ -220,20 +222,12 @@ def from_naver(query, limit=10):
     return out
 
 
-def already_published(days=7):
+def already_published(recent):
+    """지난 브리핑에 실린 주소(한 가지 모양으로 줄인 것)와 제목."""
     seen = set()
-    folder = os.path.join(ROOT, "briefings")
-    today = dt.datetime.now(KST).date()
-    for i in range(1, days + 1):
-        p = os.path.join(folder, (today - dt.timedelta(days=i)).isoformat() + ".json")
-        if os.path.exists(p):
-            try:
-                with open(p, encoding="utf-8") as f:
-                    for it in json.load(f).get("items", []):
-                        seen.add(it.get("url", ""))
-                        seen.add(it.get("title", ""))
-            except Exception:
-                pass
+    for it in recent:
+        seen.add(norm_url(it["url"]))
+        seen.add(it["title"])
     return seen
 
 
@@ -245,7 +239,8 @@ def main():
 
     today = dt.datetime.now(KST).date()
     oldest = (today - dt.timedelta(days=a.days)).isoformat()
-    seen = already_published()
+    recent = recent_items(today.isoformat())
+    seen = already_published(recent)
     jobs = []
     jobs += [("교육부 보도자료", from_moe, (), 15), ("서울시교육청 보도자료", from_sen, (), 12),
              ("경기도교육청 보도자료", from_goe, (), 15)]
@@ -262,13 +257,14 @@ def main():
             continue
         kept = []
         for it in items:
-            if it["url"] in urls or it["url"] in seen or it["title"] in seen:
+            key = norm_url(it["url"])
+            if key in urls or key in seen or it["title"] in seen:
                 continue
             if it.get("date") and it["date"] < oldest:
                 continue
             if name == "연합뉴스 사회" and not EDU_WORDS.search(it["title"]):
                 continue
-            urls.add(it["url"])
+            urls.add(key)
             kept.append(it)
             if len(kept) >= limit:
                 break
@@ -276,13 +272,16 @@ def main():
         candidates += kept
 
     result = {"generated_at": dt.datetime.now(KST).isoformat(timespec="seconds"),
-              "today": today.isoformat(), "oldest": oldest, "report": report, "candidates": candidates}
+              "today": today.isoformat(), "oldest": oldest, "report": report,
+              # 지난 7일 브리핑에 이미 실린 소식. 같은 사건을 다룬 후보는 주소가 달라도 싣지 않는다.
+              "recent": [{"date": r["date"], "category": r["category"], "title": r["title"]} for r in recent],
+              "candidates": candidates}
     text = json.dumps(result, ensure_ascii=False, indent=1)
     if a.out:
         with open(a.out, "w", encoding="utf-8") as f:
             f.write(text)
         ok = sum(1 for r in report if r["ok"])
-        print("sources ok %d/%d, candidates %d -> %s" % (ok, len(report), len(candidates), a.out))
+        print("sources ok %d/%d, candidates %d, recent %d -> %s" % (ok, len(report), len(candidates), len(recent), a.out))
         for r in report:
             if not r["ok"]:
                 print("FAILED", r["source"], r["error"])

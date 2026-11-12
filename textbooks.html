@@ -261,6 +261,35 @@ footer p { margin: 0 0 4px; }
 .views { background: none; padding: 0; gap: 16px; }
 .views a { padding: 0 2px; min-height: 44px; border-radius: 0; font-size: 16px; font-weight: 700; color: var(--muted); }
 .views a[aria-current="page"] { background: none; color: var(--text); box-shadow: inset 0 -2px 0 var(--text); }
+/* 학교 목록: 한 줄에 중1 · 중2 · 중3 교과서. 별을 누르면 "내 학교"로 맨 위에 모인다 */
+.sec-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 16px 0 0; font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
+.sec-h .n { font-size: 13px; font-weight: 500; color: var(--muted); }
+.mine { padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.mine .s-row:last-child { border-bottom: 0; }
+.hint { margin: 2px 0 6px; font-size: 13px; color: var(--muted); }
+.s-list { display: flex; flex-direction: column; }
+.s-row { display: flex; align-items: center; gap: 4px; border-bottom: 1px solid var(--border); }
+.s-main { flex: 1; min-width: 0; min-height: 62px; padding: 10px 0; border: 0; background: none; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: center; gap: 4px; border-radius: 8px; }
+.s-main:hover .s-name b { text-decoration: underline; text-underline-offset: 3px; }
+.s-name { display: flex; align-items: baseline; gap: 8px; }
+.s-name b { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+.s-reg { font-size: 12px; color: var(--muted); }
+.s-books { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; font-size: 13px; color: var(--muted); }
+.s-b { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.s-b i { flex: none; width: 7px; height: 7px; border-radius: 2px; background: var(--c, var(--muted)); }
+.s-b .tx { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.s-b.none { opacity: .6; }
+.star svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; color: var(--muted); }
+.star[aria-pressed="true"] svg { fill: currentColor; color: var(--accent); }
+.count-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.vsw { display: flex; gap: 2px; flex: none; }
+.vsw .icon-btn { width: 40px; height: 40px; border-radius: 8px; color: var(--muted); }
+.vsw .icon-btn svg { width: 20px; height: 20px; }
+.vsw .icon-btn[aria-pressed="true"] { color: var(--text); background: var(--raised); }
+.mine-btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 10px; border: 0; border-radius: 8px; background: var(--raised); font-size: 14px; font-weight: 700; cursor: pointer; }
+.mine-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+.mine-btn[aria-pressed="true"] { background: var(--text); color: var(--ground); }
+.mine-btn[aria-pressed="true"] svg { fill: currentColor; }
 /* 어두운 화면: 검정 칸이 검은 바탕에 묻히지 않게 */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) [style*="--c: #111111"] { --c: #2b2b2b !important; }
@@ -275,6 +304,7 @@ footer p { margin: 0 0 4px; }
 .tabbar svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .tabbar a[aria-current="page"] svg { fill: currentColor; }
 .tabbar a:active svg { transform: scale(.9); }
+.toast { bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 16px); }
 .top .title .logo { font-size: 21px; font-weight: 800; letter-spacing: -0.045em; }
 .top .title .logo b { color: var(--accent); font-weight: 800; }
 </style>
@@ -332,6 +362,7 @@ footer p { margin: 0 0 4px; }
     list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>',
     people: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="9" cy="8" r="4"/><path d="M17 11a3 3 0 1 0 0-6M21 21v-2a4 4 0 0 0-3-3.9"/></svg>',
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.9l6-.8z"/></svg>',
     prev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
     next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>'
   };
@@ -362,6 +393,16 @@ footer p { margin: 0 0 4px; }
   }
   function store(k, v) { try { localStorage.setItem("tb." + k, v); } catch (e) {} }
   function recall(k) { try { return localStorage.getItem("tb." + k); } catch (e) { return null; } }
+  /* 내 학교: 별을 누른 학교의 번호 목록. 이 기기에만 남는다 */
+  function getMine() { try { var a = JSON.parse(recall("mine") || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function isMine(code) { return getMine().indexOf(code) >= 0; }
+  function toggleMine(code) {
+    var a = getMine(), at = a.indexOf(code);
+    if (at >= 0) a.splice(at, 1); else a.push(code);
+    store("mine", JSON.stringify(a));
+    toast(at >= 0 ? "내 학교에서 뺐습니다" : "내 학교에 넣었습니다");
+    return at < 0;
+  }
   function toast(msg) { toastEl.textContent = msg; toastEl.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(function () { toastEl.classList.remove("on"); }, 1600); }
   function regionShort(r) { return r.replace(/^경기\s*/, ""); }
   function shortSchool(s) { return s.replace(/중학교$/, "중"); }
@@ -429,6 +470,64 @@ footer p { margin: 0 0 4px; }
     var regions = [];
     DATA.schools.forEach(function (s) { if (regions.indexOf(s.region) < 0) regions.push(s.region); });
     if (!state.region || regions.indexOf(state.region) < 0) state.region = regions[0];
+    var mineBox = el("div");
+    app.appendChild(mineBox);
+
+    // 학교 한 줄: 이름, 중1 · 중2 · 중3 교과서, 내 학교 별
+    function schoolRow(i, showRegion) {
+      var s = DATA.schools[i];
+      var y = s.years["2026"] || s.years[Object.keys(s.years).sort()[0]] || {};
+      var row = el("div", "s-row");
+      var main = el("button", "s-main"); main.type = "button";
+      var nm = el("span", "s-name");
+      nm.appendChild(el("b", null, shortSchool(s.school)));
+      if (showRegion) nm.appendChild(el("span", "s-reg", regionShort(s.region)));
+      main.appendChild(nm);
+      var bk = el("span", "s-books"), said = [];
+      ["1", "2", "3"].forEach(function (g) {
+        var t = y[g];
+        var c = el("span", "s-b" + (t ? "" : " none"));
+        if (t) { var dot = el("i"), pc = pubColor(t.publisher); if (pc !== PALETTE[6]) paint(dot, pc); c.appendChild(dot); }
+        c.appendChild(el("span", "tx", g + " " + (t ? shortPub(t.publisher) + " " + t.author : "공개 안 됨")));
+        bk.appendChild(c);
+        said.push("중" + g + " " + (t ? t.publisher + " " + t.author : "공개 안 됨"));
+      });
+      main.appendChild(bk);
+      main.setAttribute("aria-label", s.school + ", " + said.join(", "));
+      main.addEventListener("click", function () { openSchool(i); });
+      row.appendChild(main);
+      var st = iconBtn("star", ""); st.classList.add("star");
+      st.setAttribute("data-star", s.code);
+      function sync() { var on = isMine(s.code); st.setAttribute("aria-pressed", String(on)); st.setAttribute("aria-label", s.school + (on ? " 내 학교에서 빼기" : " 내 학교에 넣기")); }
+      sync();
+      st.addEventListener("click", function () {
+        var before = st.getBoundingClientRect().top;
+        toggleMine(s.code);
+        fillMine();
+        var hint = app.querySelector(".hint");
+        if (hint && getMine().length) hint.remove();
+        app.querySelectorAll('[data-star="' + s.code + '"]').forEach(function (b) { var on = isMine(s.code); b.setAttribute("aria-pressed", String(on)); b.setAttribute("aria-label", s.school + (on ? " 내 학교에서 빼기" : " 내 학교에 넣기")); });
+        // 위쪽 "내 학교" 높이가 바뀌어도 누른 줄이 제자리에 있게 한다
+        if (st.isConnected) window.scrollBy(0, st.getBoundingClientRect().top - before);
+      });
+      row.appendChild(st);
+      return row;
+    }
+    function fillMine() {
+      mineBox.textContent = "";
+      mineBox.className = "";
+      if (state.q.replace(/\s/g, "")) return;
+      var mine = getMine().map(function (code) { return DATA.schools.findIndex(function (s) { return s.code === code; }); }).filter(function (i) { return i >= 0; });
+      if (!mine.length) return;
+      mineBox.className = "mine";
+      var h = el("h2", "sec-h", "내 학교");
+      h.appendChild(el("span", "n", mine.length + "곳"));
+      mineBox.appendChild(h);
+      var l = el("div", "s-list");
+      mine.forEach(function (i) { l.appendChild(schoolRow(i, true)); });
+      mineBox.appendChild(l);
+    }
+    fillMine();
     var rr = el("div", "regions");
     rr.setAttribute("role", "group");
     rr.setAttribute("aria-label", "지역");
@@ -460,8 +559,26 @@ footer p { margin: 0 0 4px; }
         var s = DATA.schools[i];
         return q ? s.school.replace(/\s/g, "").indexOf(q) >= 0 : s.region === state.region;
       });
-      rows.appendChild(el("div", "count", q ? "검색 결과 " + list.length + "곳" : regionShort(state.region) + " 중학교 " + list.length + "곳"));
+      var asGrid = recall("sview") === "grid";
+      var cr = el("div", "count count-row");
+      cr.appendChild(el("span", null, q ? "검색 결과 " + list.length + "곳" : regionShort(state.region) + " 중학교 " + list.length + "곳"));
+      var sw = el("div", "vsw"); sw.setAttribute("role", "group"); sw.setAttribute("aria-label", "보는 방법");
+      [["list", "목록으로 보기"], ["grid", "색 격자로 보기"]].forEach(function (v) {
+        var vb = iconBtn(v[0], v[1]);
+        vb.setAttribute("aria-pressed", String((v[0] === "grid") === asGrid));
+        vb.addEventListener("click", function () { store("sview", v[0]); fill(); });
+        sw.appendChild(vb);
+      });
+      cr.appendChild(sw);
+      rows.appendChild(cr);
+      if (!q && !getMine().length) rows.appendChild(el("p", "hint", "학교 이름 옆 별을 누르면 \"내 학교\"로 맨 위에 모입니다."));
       if (!list.length) { var e = el("div", "empty"); e.appendChild(el("b", null, "찾는 학교가 없습니다")); e.appendChild(el("span", null, "학교 이름 일부만 넣어 보세요. 예: 동탄, 광교")); rows.appendChild(e); }
+      if (!asGrid) {
+        var sl = el("div", "s-list");
+        list.forEach(function (i) { sl.appendChild(schoolRow(i, !!q)); });
+        if (list.length) rows.appendChild(sl);
+        return;
+      }
       var grid = el("div", "explore");
       list.forEach(function (i) {
         var s = DATA.schools[i];
@@ -479,7 +596,7 @@ footer p { margin: 0 0 4px; }
       });
       if (list.length) rows.appendChild(grid);
     }
-    inp.addEventListener("input", function () { state.q = inp.value; fill(); });
+    inp.addEventListener("input", function () { state.q = inp.value; fillMine(); fill(); });
     fill();
   }
 
@@ -519,6 +636,13 @@ footer p { margin: 0 0 4px; }
     } else {
       nm.appendChild(el("span", "pill neutral", years[0] + "학년도"));
     }
+    var mb = el("button", "mine-btn"); mb.type = "button";
+    mb.innerHTML = ICON.star;
+    mb.appendChild(el("span", null, "내 학교"));
+    function syncMine() { var on = isMine(s.code); mb.setAttribute("aria-pressed", String(on)); mb.setAttribute("aria-label", on ? "내 학교에서 빼기" : "내 학교에 넣기"); }
+    syncMine();
+    mb.addEventListener("click", function () { toggleMine(s.code); syncMine(); });
+    nm.appendChild(mb);
     m.appendChild(nm);
     var st = el("ul", "stats");
     function stat(n, label) { var li = el("li"); li.appendChild(el("b", null, String(n))); li.appendChild(el("span", null, label)); st.appendChild(li); }

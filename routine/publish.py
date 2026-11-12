@@ -9,7 +9,9 @@ import os
 import re
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from recent import norm_url, recent_items
+
+ROOT =os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CATEGORIES = ["교과서 · 교육과정", "중학 영어 · 내신", "정책 · 제도", "학원 운영", "에듀테크 · AI", "입시 · 고입", "학원가 소식"]
 
 
@@ -31,6 +33,10 @@ def check(path):
     if not items and not (data.get("note") or "").strip():
         errors.append("항목이 없으면 note 에 이유를 적어야 한다")
     seen = set()
+    # 지난 7일 브리핑에 실린 주소. 같은 기사를 다시 싣지 않는다.
+    past = {}
+    for r in recent_items(m.group(1)):
+        past.setdefault(norm_url(r["url"]), r["date"])
     for i, it in enumerate(items, 1):
         for key in ("category", "title", "summary", "source", "url"):
             if not str(it.get(key) or "").strip():
@@ -40,9 +46,12 @@ def check(path):
             errors.append("%d번 항목: url 이 http 주소가 아니다" % i)
         if "news.google.com" in url or "search.naver.com" in url:
             errors.append("%d번 항목: 검색 중계 주소다. 언론사 원문 주소로 바꿔야 한다" % i)
-        if url in seen:
+        key = norm_url(url)
+        if key in seen:
             errors.append("%d번 항목: 같은 주소가 두 번 나온다" % i)
-        seen.add(url)
+        seen.add(key)
+        if key in past:
+            errors.append("%d번 항목: %s 브리핑에 이미 실린 기사다. 이 항목을 뺀다" % (i, past[key]))
         if it.get("category") not in CATEGORIES:
             errors.append("%d번 항목: category 는 %s 중 하나여야 한다" % (i, " / ".join(CATEGORIES)))
         if len(str(it.get("summary") or "")) > 400:

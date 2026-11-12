@@ -163,7 +163,7 @@
       topL.appendChild(el("span", "top-title", view === "days" ? "지난 소식" : view === "saved" ? "저장한 소식" : fmtShort(dates[current]) + " 소식"));
     }
     if (view === "feed" && dates.length) {
-      if (home) topR.appendChild(el("span", "daylab", "오늘"));
+      if (home && data && data.date === todayKST()) topR.appendChild(el("span", "daylab", "오늘"));
       var c = iconBtn("cal", "지난 소식 고르기");
       c.addEventListener("click", function () { show("days", current, true); });
       topR.appendChild(c);
@@ -219,7 +219,6 @@
     var seen = getSeen();
     feed.textContent = "";
     feed.setAttribute("aria-busy", "false");
-    feed.appendChild(el("h1", "sr", fmtShort(data.date) + " 교육 브리핑, 소식 " + items.length + "건"));
     document.title = "교육 브리핑 — " + fmtShort(data.date);
 
     var row = el("nav", "stories");
@@ -233,6 +232,7 @@
       row.appendChild(story(SHORT[c] || c.slice(0, 2), LABEL[c] || c, c, allSeen, c, 1 + order.indexOf(idx[0])));
     });
     feed.appendChild(row);
+    feed.appendChild(digest(items));
 
     if (!items.length) {
       var e = el("div", "empty-note");
@@ -240,8 +240,48 @@
       e.appendChild(document.createTextNode(data.note || ""));
       feed.appendChild(e);
     }
+    if (items.length) feed.appendChild(el("h2", "sec-h", "카드로 보기"));
     order.forEach(function (i, n) { feed.appendChild(post(items[i], i, n)); });
     feed.appendChild(caught(items));
+  }
+
+  /* 한눈에 보기: 날짜, 건수, 소식마다 제목과 확인할 것. 한 화면에서 그날 브리핑을 다 훑는다 */
+  function todayKST() { return new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10); }
+  function digest(items) {
+    var sec = el("section", "digest");
+    var p = parts(data.date);
+    var h = el("h1", "d-date", p.m + "월 " + p.d + "일 " + p.w + "요일");
+    h.appendChild(el("span", "sr", " 교육 브리핑"));
+    sec.appendChild(h);
+    var todos = items.filter(function (it) { return (it.why || "").trim(); }).length;
+    sec.appendChild(el("p", "d-count", items.length ? "소식 " + items.length + "건" + (todos ? " · 확인할 일 " + todos + "가지" : "") : "새 소식 없음"));
+    if (current === 0 && data.date < todayKST()) {
+      sec.appendChild(el("p", "d-stale", "오늘 브리핑은 아직 올라오지 않았습니다. 보통 아침 7시쯤 올라옵니다. 아래는 " + fmtMD(data.date) + " 소식입니다."));
+    }
+    if (!items.length) return sec;
+    var ol = el("ol", "d-list");
+    order.forEach(function (i, n) {
+      var it = items[i];
+      var li = el("li");
+      var b = paint(el("button", "d-row"), it.category);
+      b.type = "button";
+      b.appendChild(el("span", "d-cat", SHORT[it.category] || (it.category || "소식").slice(0, 2)));
+      var t = el("span", "d-txt");
+      t.appendChild(el("b", null, cardTitle(it)));
+      if ((it.why || "").trim()) {
+        var w = el("span", "d-why");
+        w.appendChild(el("i", null, "확인"));
+        w.appendChild(document.createTextNode(it.why));
+        t.appendChild(w);
+      }
+      b.appendChild(t);
+      b.setAttribute("aria-label", (LABEL[it.category] || it.category || "소식") + ": " + it.title + ". 크게 보기");
+      b.addEventListener("click", function () { openReels(1 + n, b); });
+      li.appendChild(b);
+      ol.appendChild(li);
+    });
+    sec.appendChild(ol);
+    return sec;
   }
 
   function story(text, label, cat, seen, colorOf, at) {
