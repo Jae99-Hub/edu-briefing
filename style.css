@@ -187,3 +187,10 @@ mark { background: var(--mk, var(--marker)); color: var(--marker-ink); padding: 
 .s-skel, .av-skel, .line-skel, .card-skel { animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity: .55; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* 어두운 화면: 검정 카드·동그라미가 검은 바탕에 묻히지 않게 한 단계 밝게 */
+@media (prefers-color-scheme: dark) {
+  [style*="--c: #111111"] { --c: #2b2b2b !important; }
+  .slide.todo { background: #1c1c1c; }
+  .reel.sum-reel { background: #161616; }
+}
