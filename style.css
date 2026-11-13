@@ -133,24 +133,27 @@ mark { background: var(--mk, var(--marker)); color: var(--marker-ink); padding: 
 .reel .bigt.l { font-size: clamp(32px, 9.4vw, 44px); }
 .reel .bigt.m { font-size: clamp(28px, 8vw, 37px); }
 .reel .bigt.s { font-size: clamp(25px, 7vw, 32px); }
-.reel .low { flex: none; max-height: 68%; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 16px; background: var(--ground); color: var(--text); border-radius: 22px 22px 0 0; padding: 20px 20px calc(env(safe-area-inset-bottom) + 16px); }
-.reel .txt { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.reel .src { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; }
-.reel .src .av { width: 30px; height: 30px; font-size: 12px; }
-.reel .chip { font-size: 13px; font-weight: 600; color: var(--muted); }
+/* 읽기 판: 글만 안에서 넘기고 단추 줄은 늘 보인다. 판 위에서 쓸어 넘겨도 다음 소식으로 가야 하므로 넘김을 가두지 않는다 */
+.reel .low { flex: none; max-height: 74%; overflow: hidden; display: flex; flex-direction: column; gap: 16px; background: var(--ground); color: var(--text); border-radius: 22px 22px 0 0; padding: 20px 20px calc(env(safe-area-inset-bottom) + 16px); }
+.reel .txt { flex: 0 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.reel .txt > * { flex: none; }
+.reel .src { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; line-height: 1.3; }
+.reel .src > span:nth-child(2) { min-width: 0; }
+.reel .src .av { width: 30px; height: 30px; font-size: 12px; flex: none; }
+.reel .chip { flex: none; white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--muted); }
 .reel .chip::before { content: "· "; }
 .reel .sum { margin: 0; font-size: 17px; line-height: 1.7; }
 .reel .sum.clamp { display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
 .reel .sum-more { align-self: flex-start; border: 0; background: none; padding: 0; color: var(--muted); font-weight: 700; font-size: 15px; cursor: pointer; min-height: 32px; text-decoration: underline; text-underline-offset: 3px; }
 .reel .todo { background: var(--raised); border-radius: 12px; padding: 14px 16px; font-size: 16px; line-height: 1.6; }
 .reel .todo b { display: inline-block; font-size: 13px; font-weight: 800; background: var(--marker); color: var(--marker-ink); padding: 1px 6px; margin-right: 8px; }
-.reel .side { display: flex; align-items: center; gap: 8px; }
+.reel .side { flex: none; display: flex; align-items: center; gap: 8px; }
 .reel .side a, .reel .side button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 48px; padding: 0 16px; white-space: nowrap; border: 0; border-radius: 12px; background: var(--raised); color: var(--text); text-decoration: none; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
 .reel .side a { flex: 1; background: var(--text); color: var(--ground); }
 .reel .side a:active, .reel .side button:active { transform: scale(.97); }
 .reel .side svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .reel .side button[aria-pressed="true"] svg { fill: currentColor; }
-.reel .src .n { margin-left: auto; font-size: 14px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.reel .src .n { flex: none; white-space: nowrap; margin-left: auto; font-size: 14px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
 .reel.sum-reel { background: #111; color: #fff; }
 .reel.sum-reel .reel-in { padding: calc(env(safe-area-inset-top) + 64px) 20px calc(env(safe-area-inset-bottom) + 22px); overflow-y: auto; }
 .reel.sum-reel .bigt { margin: 8px 0 0; padding: 0; }

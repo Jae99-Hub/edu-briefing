@@ -206,6 +206,8 @@
 
   /* 오늘 화면: 날짜 → 으뜸 소식 카드 하나 → 나머지 소식 줄. 한 화면에서 그날 브리핑을 다 훑는다 */
   function todayKST() { return new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10); }
+  // "오늘 · 어제 · 2일 전" 은 그날 브리핑을 그날 볼 때만 맞다. 지난 날 화면에서는 날짜를 그대로 적는다
+  function relDay() { return data.date === todayKST() ? data.date : null; }
   function renderFeed() {
     if (!data) return;
     var items = Array.isArray(data.items) ? data.items : [];
@@ -228,7 +230,7 @@
         var ol = el("ol", "d-list");
         order.slice(1).forEach(function (i, k) {
           var li = el("li");
-          var b = row(items[i], "button", data.date);
+          var b = row(items[i], "button", relDay());
           b.setAttribute("aria-label", (LABEL[items[i].category] || items[i].category || "소식") + ": " + items[i].title + ". 크게 보기");
           b.addEventListener("click", function () { openReels(2 + k, b); });
           li.appendChild(b);
@@ -270,7 +272,7 @@
     b.setAttribute("aria-label", (LABEL[it.category] || it.category || "소식") + ": " + it.title + ". 크게 보기");
     var top = el("span", "l-top");
     top.appendChild(el("span", "tag", it.category || "소식"));
-    top.appendChild(el("span", "by", byline(it, data.date)));
+    top.appendChild(el("span", "by", byline(it, relDay())));
     b.appendChild(top);
     b.appendChild(marked(el("h2", cardTitle(it).length <= 24 ? "l" : "s"), it));
     if ((it.why || "").trim()) b.appendChild(whyLine(it, "l-why"));
@@ -413,13 +415,19 @@
       txt.appendChild(src);
       var sum = el("p", "sum", it.summary || "");
       txt.appendChild(sum);
-      if ((it.summary || "").length > 90) {
-        sum.classList.add("clamp");
-        var mb = el("button", "sum-more", "더 보기");
-        mb.type = "button";
-        mb.addEventListener("click", function () { var c = sum.classList.toggle("clamp"); mb.textContent = c ? "더 보기" : "접기"; });
-        txt.appendChild(mb);
-      }
+      // 요약은 판에 다 들어가면 그대로 보여 주고, 넘칠 때만 fitSums 가 줄여서 "더 보기" 를 내놓는다
+      var mb = el("button", "sum-more", "더 보기");
+      mb.type = "button";
+      mb.hidden = true;
+      mb.addEventListener("click", function () {
+        var open = mb.dataset.open !== "1";
+        mb.dataset.open = open ? "1" : "";
+        sum.classList.toggle("clamp", !open);
+        sum.style.webkitLineClamp = open ? "" : (mb.dataset.keep || "");
+        mb.textContent = open ? "접기" : "더 보기";
+        if (!open) txt.scrollTop = 0;
+      });
+      txt.appendChild(mb);
       if ((it.why || "").trim()) {
         var td = el("div", "todo");
         td.appendChild(el("b", null, "확인할 것"));
@@ -469,7 +477,30 @@
     try { history.pushState({ v: view, d: current, depth: depth() + 1, reels: true }, "", location.href.split("#")[0]); reelsPushed = true; } catch (e) {}
     document.addEventListener("keydown", onKey);
     x.focus();
+    fitSums();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSums);
   }
+  /* 큰 보기의 요약을 화면 높이에 맞춘다: 다 들어가면 전부, 넘치면 들어가는 줄 수만큼만 보이고 "더 보기" */
+  function fitSums() {
+    if (reels.hidden || !reels.__list) return;
+    reels.__list.forEach(function (r) {
+      var txt = r.querySelector(".txt"), sum = r.querySelector(".sum"), mb = r.querySelector(".sum-more");
+      if (!txt || !sum || !mb || mb.dataset.open === "1") return;
+      sum.classList.remove("clamp");
+      sum.style.webkitLineClamp = "";
+      mb.hidden = true;
+      var over = txt.scrollHeight - txt.clientHeight;
+      if (over <= 1) return;
+      var lh = parseFloat(getComputedStyle(sum).lineHeight) || 29;
+      var lines = Math.round(sum.getBoundingClientRect().height / lh);
+      var keep = Math.max(3, Math.min(lines - 1, lines - Math.ceil((over + 44) / lh)));
+      mb.dataset.keep = keep;
+      sum.style.webkitLineClamp = keep;
+      sum.classList.add("clamp");
+      mb.hidden = false;
+    });
+  }
+  window.addEventListener("resize", fitSums);
   var reelsPushed = false;
   function requestClose() { if (reelsPushed) history.back(); else closeReels(); }
   function closeReels() {
