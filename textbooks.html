@@ -4,310 +4,209 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>교과서 — 교육 브리핑</title>
-<meta name="description" content="경기 오산 · 수원 · 화성 · 용인 중학교의 학년별 영어 교과서와 단원별 핵심 문법">
+<meta name="description" content="경기 수원 · 화성 · 용인 · 오산 중학교의 학년별 영어 교과서와 단원별 핵심 문법">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23cc4210'/%3E%3Crect x='7' y='17' width='18' height='7' fill='%23ffe14d'/%3E%3Cpath d='M9 10h14M9 15h10' stroke='%23fff' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-/* 레이아웃: 사진 앱의 프로필 화면처럼. 위에 지역 동그라미와 검색, 학교를 고르면
-   프로필(학교 이름, 학년 동그라미 3개, 숫자 세 개)과 단원 격자 3열이 나온다.
-   색은 라즈베리 하나만 작은 표시에 쓰고 넓은 면은 옅은 톤만. 그림자·그러데이션 없음. */
+/* 교과서 화면: 검색 하나, 보기 셋(학교 · 지도 · 교과서), 지역 한 줄.
+   학교를 누르면 중1 · 중2 · 중3 교과서와 단원이 한 화면에 다 나온다. 따로 고르는 탭은 두지 않는다.
+   이 파일이 사이트의 textbooks.html 그대로다 (tools/make_site_textbooks.py 가 site/ 로 옮긴다). */
 :root {
-  --ground: #ffffff;
-  --raised: #f3f4f6;
-  --raised-2: #e7e8ec;
-  --border: #e5e7eb;
-  --text: #0f1115;
-  --muted: #5f6672;
-  --accent: #cc4210;
-  --accent-soft: #fff1e8;
-  --accent-track: #ffd9c2;
-  --accent-ink: #7a2606;
-  --marker: #ffe14d;
-  --on-accent: #ffffff;
-  --ok-bg: #dcfce7; --ok-fg: #14532d;
-  --warn-bg: #fffbeb; --warn-fg: #92400e;
-  --bad-bg: #ffedea; --bad-fg: #831c1e;
-  --scrim: rgba(15, 17, 21, .5);
+  --ground: #ffffff; --raised: #f3f4f6; --raised-2: #e7e8ec; --border: #e5e7eb;
+  --text: #0f1115; --muted: #5f6672; --accent: #cc4210; --on-accent: #ffffff; --marker: #ffe14d;
+  --ok-bg: #dcfce7; --ok-fg: #14532d; --warn-bg: #fffbeb; --warn-fg: #92400e; --bad-bg: #ffedea; --bad-fg: #831c1e;
+  --tab-h: 56px;
   --font: "Pretendard Variable", Pretendard, "Noto Sans KR", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --ground: #000000; --raised: #121212; --raised-2: #1f1f1f; --border: #262626;
-    --text: #f5f5f5; --muted: #a8a8a8;
-    --accent: #ff7a45; --accent-soft: #2b1308; --accent-track: #4a2210; --accent-ink: #ffd2bd; --on-accent: #120309;
+    --text: #f5f5f5; --muted: #a8a8a8; --accent: #ff7a45; --on-accent: #120309;
     --ok-bg: #12301f; --ok-fg: #a7e3bd; --warn-bg: #33270d; --warn-fg: #f3d08a; --bad-bg: #3a1813; --bad-fg: #f5b4a7;
-    --scrim: rgba(0, 0, 0, .7);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --ground: #000000; --raised: #121212; --raised-2: #1f1f1f; --border: #262626;
-  --text: #f5f5f5; --muted: #a8a8a8;
-  --accent: #ff7a45; --accent-soft: #2b1308; --accent-track: #4a2210; --accent-ink: #ffd2bd; --on-accent: #120309;
+  --text: #f5f5f5; --muted: #a8a8a8; --accent: #ff7a45; --on-accent: #120309;
   --ok-bg: #12301f; --ok-fg: #a7e3bd; --warn-bg: #33270d; --warn-fg: #f3d08a; --bad-bg: #3a1813; --bad-fg: #f5b4a7;
-  --scrim: rgba(0, 0, 0, .7);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html, body { background: var(--ground); margin: 0; }
-body { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
-body { color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; }
+body { color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px)); }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--ground); }
 button, input { font: inherit; color: inherit; }
 a { color: inherit; }
+h1, h2, h3, p { margin: 0; }
+::selection { background: var(--marker); color: #111111; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.gutter { max-width: 935px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.gutter { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.muted { color: var(--muted); }
 
 /* 맨 위 막대 */
 .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--ground); border-bottom: 1px solid var(--border); }
-.top .gutter { height: 56px; display: flex; align-items: center; gap: 8px; }
-.top .title { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mark { width: 28px; height: 28px; flex: none; }
-.mark rect { fill: var(--accent); }
-.mark path { stroke: var(--on-accent); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+.top .gutter { height: 56px; display: flex; align-items: center; gap: 4px; }
+.logo { font-size: 21px; font-weight: 800; letter-spacing: -0.04em; text-decoration: none; }
+.logo b { color: var(--accent); font-weight: 800; }
 .icon-btn { width: 44px; height: 44px; flex: none; border: 0; background: none; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: background .15s, transform .1s; }
 .icon-btn:hover { background: var(--raised); }
 .icon-btn:active { transform: scale(.92); }
 .icon-btn svg { width: 24px; height: 24px; }
-.views { display: flex; background: var(--raised); border-radius: 8px; padding: 3px; gap: 2px; flex: none; }
-.views a { display: flex; align-items: center; min-height: 34px; padding: 0 12px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 500; color: var(--muted); }
-.views a[aria-current="page"] { background: var(--ground); color: var(--text); font-weight: 700; }
+#back-slot .icon-btn { margin-left: -10px; }
 
-/* 지역 동그라미 */
-.regions { display: flex; gap: 14px; overflow-x: auto; padding: 16px 0 12px; scrollbar-width: none; }
-.regions::-webkit-scrollbar { display: none; }
-.region { flex: none; width: 72px; border: 0; background: none; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.ring { width: 66px; height: 66px; border-radius: 50%; padding: 2px; background: var(--raised-2); display: grid; place-items: center; transition: transform .15s; }
-.region[aria-pressed="true"] .ring { background: var(--accent); padding: 3px; }
-.region:active .ring { transform: scale(.94); }
-.bubble { width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--ground); background: var(--raised); display: grid; place-items: center; font-weight: 700; font-size: 16px; letter-spacing: -0.02em; }
-.region[aria-pressed="true"] .bubble { background: var(--accent-soft); color: var(--accent-ink); }
-.region .lab { font-size: 13px; color: var(--muted); }
-.region[aria-pressed="true"] .lab { color: var(--text); font-weight: 500; }
-
-/* 검색 */
-.search { position: relative; margin: 4px 0 8px; }
-.search input { width: 100%; height: 40px; border: 0; border-radius: 8px; background: var(--raised); padding: 0 12px 0 38px; font-size: 16px; }
+/* 처음 화면: 검색, 보기 셋, 지역 한 줄 */
+.search { position: relative; display: block; margin-top: 14px; }
+.search svg { position: absolute; left: 14px; top: 50%; width: 20px; height: 20px; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.search input { width: 100%; height: 48px; border: 0; border-radius: 12px; background: var(--raised); padding: 0 14px 0 44px; font-size: 17px; }
 .search input::placeholder { color: var(--muted); }
-.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--muted); pointer-events: none; }
-
-/* 검색 결과 줄 */
-.rows { display: flex; flex-direction: column; padding: 4px 0 24px; }
-.row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 8px 0; border: 0; background: none; text-align: left; cursor: pointer; border-radius: 8px; }
-.row:hover .r-name { text-decoration: underline; text-underline-offset: 3px; }
-.avatar { flex: none; width: 44px; height: 44px; border-radius: 50%; background: var(--raised); display: grid; place-items: center; font-weight: 700; font-size: 16px; }
-.avatar.pri { background: var(--accent-soft); color: var(--accent-ink); }
-.r-txt { min-width: 0; flex: 1; display: flex; flex-direction: column; }
-.r-name { font-size: 16px; font-weight: 700; }
-.r-sub { font-size: 14px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.group { font-size: 16px; font-weight: 700; margin: 18px 0 2px; }
-.count { font-size: 14px; color: var(--muted); padding: 4px 0; }
-
-/* 프로필 */
-.profile { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px 24px; align-items: center; padding: 20px 0 8px; }
-@media (min-width: 735px) { .profile { gap: 16px 64px; padding: 32px 32px 12px; } }
-.p-av { width: 86px; height: 86px; border-radius: 50%; background: var(--marker); color: #111111; box-shadow: 0 0 0 3px var(--ground), 0 0 0 6px var(--accent); margin: 6px; display: grid; place-items: center; font-size: 34px; font-weight: 700; }
-@media (min-width: 735px) { .p-av { width: 150px; height: 150px; font-size: 56px; } }
-.p-main { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
-.p-name { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-.p-name h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.3; text-wrap: balance; }
-.stats { display: flex; gap: 22px; margin: 0; padding: 0; list-style: none; }
-.stats li { display: flex; flex-direction: column; line-height: 1.25; }
-@media (min-width: 735px) { .stats li { flex-direction: row; gap: 4px; align-items: baseline; } }
-.stats b { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.stats span { font-size: 14px; color: var(--muted); }
-.bio { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.5; }
-@media (min-width: 735px) { .bio { grid-column: 2; } }
-.bio .b-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
-.bio a { font-weight: 500; text-decoration: none; color: var(--accent); }
-.bio a:hover { text-decoration: underline; }
-.bio .muted { color: var(--muted); }
-.pill { flex: none; display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 13px; font-weight: 500; white-space: nowrap; }
-.pill.ok { background: var(--ok-bg); color: var(--ok-fg); }
-.pill.warn { background: var(--warn-bg); color: var(--warn-fg); }
-.pill.bad { background: var(--bad-bg); color: var(--bad-fg); }
-.pill.neutral { background: var(--raised); color: var(--muted); }
-.years { display: flex; gap: 6px; }
-.yr { border: 0; border-radius: 8px; height: 36px; padding: 0 14px; background: var(--raised); font-size: 15px; font-weight: 700; cursor: pointer; }
-.yr[aria-pressed="true"] { background: var(--text); color: var(--ground); }
-
-/* 학년 동그라미 (하이라이트) */
-.highlights { display: flex; gap: 20px; padding: 16px 0 20px; overflow-x: auto; scrollbar-width: none; }
-@media (min-width: 735px) { .highlights { padding-left: 32px; gap: 36px; } }
-.hl { flex: none; width: 80px; border: 0; background: none; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
-.hl .ring { width: 68px; height: 68px; }
-.hl[aria-pressed="true"] .ring { background: var(--c); padding: 3px; }
-.hl .bubble { font-size: 17px; background: var(--c); color: var(--c-ink); }
-.hl .lab { font-size: 13px; line-height: 1.35; max-width: 88px; }
-.hl:disabled { cursor: default; opacity: .45; }
-
-/* 탭 */
-.tabs { display: flex; justify-content: center; gap: 48px; border-top: 1px solid var(--border); }
-.tab { display: flex; align-items: center; gap: 6px; height: 48px; border: 0; background: none; border-top: 1px solid transparent; margin-top: -1px; color: var(--muted); font-size: 15px; font-weight: 700; cursor: pointer; }
-.tab svg { width: 16px; height: 16px; }
-.tab[aria-selected="true"] { color: var(--text); border-top-color: var(--text); }
-
-/* 단원 격자 */
-.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0; }
-@media (min-width: 735px) { .grid { gap: 4px; margin: 0; } }
-.tile { position: relative; aspect-ratio: 4 / 5; max-width: 100%; border: 0; padding: 10px; background: var(--c); color: var(--c-ink); text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; overflow: hidden; transition: filter .15s, transform .1s; }
-.tile:hover { filter: brightness(1.06); }
-.tile:active { transform: scale(.98); }
-.tile .no { font-size: clamp(26px, 8.4vw, 44px); font-weight: 800; line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
-.tile .no small { font-size: .4em; font-weight: 700; margin-left: 2px; }
-.tile .t { font-size: clamp(13px, 3.7vw, 16px); font-weight: 700; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.tile .g { align-self: flex-start; max-width: 100%; font-size: 12.5px; font-weight: 800; background: var(--mk); color: #111111; padding: 2px 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tile.extra { background: #111111; color: #ffffff; }
-.tile.extra .no { font-size: clamp(16px, 4.6vw, 24px); }
-
-/* 단원 목록 */
-.list { display: flex; flex-direction: column; }
-.li { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 14px 0; border-bottom: 1px solid var(--border); }
-.li .no { font-size: 22px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
-.li .no.extra { font-size: 14px; color: var(--accent); padding-top: 4px; }
-.li .body { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-.li .t { font-size: 17px; font-weight: 700; line-height: 1.4; letter-spacing: -0.02em; }
-.li .gr b, .sheet .k { font-weight: 700; }
-.li .fn, .li .th, .li .rd { font-size: 15px; line-height: 1.55; color: var(--muted); }
-@media (max-width: 420px) { .li { grid-template-columns: 40px minmax(0, 1fr); } .li .copy { grid-column: 2; justify-self: start; } }
-.copy { border: 0; border-radius: 8px; min-height: 44px; padding: 0 16px; background: var(--raised); font-size: 15px; font-weight: 700; cursor: pointer; transition: transform .1s; }
-.copy:active { transform: scale(.96); }
-.copy.primary { background: var(--accent); color: var(--on-accent); min-height: 44px; flex: 1; }
-
-/* 쓰는 학교 탭 */
-.users { display: flex; flex-direction: column; gap: 4px; padding: 12px 0 24px; }
-.users h2 { font-size: 16px; margin: 14px 0 2px; }
-.users p { margin: 0; font-size: 15px; }
-.users p b { font-weight: 700; margin-right: 6px; }
-
-/* 비었을 때 */
-.empty { padding: 48px 16px; text-align: center; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.seg { display: flex; margin-top: 10px; background: var(--raised); border-radius: 12px; padding: 4px; }
+.seg button { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; border: 0; background: none; border-radius: 9px; font-size: 16px; font-weight: 700; color: var(--muted); cursor: pointer; }
+.seg button svg { width: 19px; height: 19px; }
+.seg button[aria-pressed="true"] { background: var(--ground); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.14); }
+.seg.small { display: inline-flex; flex: none; margin-top: 0; border-radius: 10px; padding: 3px; }
+.seg.small button { flex: none; min-width: 54px; height: 38px; border-radius: 8px; font-size: 15px; }
+.chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding: 10px max(16px, env(safe-area-inset-left, 0px)) 2px; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--ground); color: var(--text); font-size: 15px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.chip i { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--c, var(--muted)); }
+.chip .n { font-weight: 500; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--ground); }
+.chip[aria-pressed="true"] .n { color: inherit; }
+.sec-h { display: flex; align-items: baseline; gap: 8px; margin: 22px 0 2px; font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+.sec-h .n { font-size: 14px; font-weight: 500; color: var(--muted); }
+.hint { margin: 10px 0 0; font-size: 14px; color: var(--muted); }
+.empty { padding: 44px 16px; text-align: center; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .empty b { color: var(--text); font-size: 17px; }
 
-/* 단원 크게 보기 */
-.scrim { position: fixed; inset: 0; z-index: 40; background: var(--scrim); display: flex; align-items: flex-end; justify-content: center; }
-@media (min-width: 735px) { .scrim { align-items: center; } }
-.sheet { width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto; background: var(--ground); border-radius: 16px 16px 0 0; padding: 8px max(20px, env(safe-area-inset-left, 0px)) max(20px, env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 14px; box-shadow: 0 -8px 30px rgba(0,0,0,.18); }
-@media (min-width: 735px) { .sheet { border-radius: 12px; padding: 8px 24px 24px; } }
-.grab { width: 40px; height: 4px; border-radius: 2px; background: var(--raised-2); margin: 4px auto 0; }
-.s-head { display: flex; align-items: center; gap: 10px; }
-.s-head .avatar { width: 36px; height: 36px; font-size: 14px; }
-.s-head .who { flex: 1; min-width: 0; line-height: 1.3; }
-.s-head .who b { display: block; font-size: 15px; }
-.s-head .who span { font-size: 13px; color: var(--muted); }
-.sheet h2 { margin: 0; font-size: 26px; line-height: 1.25; letter-spacing: -0.03em; text-wrap: balance; }
-.sheet .reading { margin: -6px 0 0; color: var(--muted); font-size: 15px; }
-.facts { display: flex; flex-direction: column; gap: 10px; margin: 0; }
-.facts div { display: flex; flex-direction: column; gap: 4px; }
-.facts dt { font-size: 14px; color: var(--muted); }
-.facts dd { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 12px; border-radius: 8px; background: var(--raised); font-size: 16px; font-weight: 500; }
-.facts .gram .chip { background: var(--accent-soft); color: var(--accent-ink); }
-.s-actions { display: flex; gap: 8px; padding-top: 4px; }
-.ureels { position: fixed; inset: 0; z-index: 45; background: #000; }
-.u-track { height: 100%; overflow-y: auto; scroll-snap-type: y mandatory; scrollbar-width: none; overscroll-behavior: contain; }
-.u-track::-webkit-scrollbar { display: none; }
-.ureel { height: 100vh; height: 100dvh; scroll-snap-align: start; scroll-snap-stop: always; background: var(--c); color: var(--c-ink); display: flex; justify-content: center; }
-.ureel-in { width: 100%; max-width: 520px; height: 100%; display: flex; flex-direction: column; gap: 14px; padding: calc(env(safe-area-inset-top, 0px) + 66px) 0 calc(env(safe-area-inset-bottom, 0px) + 22px) max(18px, env(safe-area-inset-left, 0px)); }
-.ureel .big { font-size: clamp(64px, 20vw, 96px); font-weight: 800; line-height: .95; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
-.ureel .big small { font-size: .35em; margin-left: 4px; }
-.ureel h2 { margin: 0; padding-right: 18px; font-size: clamp(30px, 8.6vw, 42px); font-weight: 800; line-height: 1.15; letter-spacing: -0.04em; text-wrap: balance; }
-.ureel .rd { margin: 0; padding-right: 18px; font-size: 16px; font-weight: 600; opacity: .9; }
-.ureel .low { margin-top: auto; display: flex; align-items: flex-end; gap: 12px; }
-.ureel .info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
-.ureel .k { font-size: 13px; font-weight: 800; opacity: .85; margin-bottom: 4px; }
-.ureel .gram { display: flex; flex-wrap: wrap; gap: 6px; }
-.ureel .gram mark { background: var(--mk); color: #111111; font-size: 19px; font-weight: 800; padding: 2px 8px; letter-spacing: -0.02em; }
-.ureel .fns { font-size: 16px; font-weight: 600; line-height: 1.55; }
-.ureel .side { flex: none; width: 64px; display: flex; flex-direction: column; align-items: center; gap: 16px; padding-right: 4px; }
-.ureel .side button { display: flex; flex-direction: column; align-items: center; gap: 3px; border: 0; background: none; color: inherit; font-size: 13px; font-weight: 700; cursor: pointer; min-width: 48px; min-height: 48px; }
-.ureel .side svg { width: 30px; height: 30px; }
-.ureel .side .n { font-size: 13px; font-weight: 800; }
-.u-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 2; display: flex; justify-content: center; padding-top: env(safe-area-inset-top, 0px); pointer-events: none; }
-.u-bar-in { width: 100%; max-width: 520px; height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 6px 0 max(18px, env(safe-area-inset-left, 0px)); pointer-events: auto; }
-.u-bar .ttl { font-size: 16px; font-weight: 800; color: #ffffff; background: rgba(0,0,0,.4); padding: 6px 12px; border-radius: 999px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.u-bar .icon-btn { color: #ffffff; background: rgba(0,0,0,.4); }
-
-.toast { position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 16px); opacity: 0; z-index: 60; background: var(--text); color: var(--ground); padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; pointer-events: none; transition: opacity .2s, transform .2s; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
-.toast.on { opacity: 1; transform: translate(-50%, 0); }
-
-footer { border-top: 1px solid var(--border); margin-top: 32px; padding-block: 20px 40px; color: var(--muted); font-size: 13px; line-height: 1.7; }
-footer p { margin: 0 0 4px; }
-
-.skel { display: block; border-radius: 8px; background: var(--raised); animation: pulse 1.4s ease-in-out infinite; }
-@keyframes pulse { 50% { opacity: .55; } }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
-/* 인스타 탐색 탭처럼: 색 격자 */
-.explore { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
-@media (min-width: 735px) { .explore { gap: 4px; margin: 0; } }
-.xt { aspect-ratio: 4 / 5; max-width: 100%; border: 0; padding: 10px; background: var(--c); color: var(--c-ink); text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; overflow: hidden; font: inherit; transition: filter .15s, transform .1s; }
-.xt:hover { filter: brightness(1.06); }
-.xt:active { transform: scale(.98); }
-.xt .nm { font-size: clamp(19px, 5.8vw, 28px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; word-break: keep-all; }
-.xt .sub { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; font-size: 13px; font-weight: 700; line-height: 1.3; min-width: 0; max-width: 100%; }
-.xt mark { background: var(--mk); color: #111111; padding: 2px 5px; font-size: 12.5px; font-weight: 800; line-height: 1.35; max-width: 100%; text-wrap: balance; }
-.xt .meta { opacity: .9; }
-.group { margin: 22px 0 8px; }
-.count { padding: 4px 0 8px; }
-/* 지역: 색 스토리 동그라미, 고른 지역만 테두리에 색 */
-.region .ring { background: var(--raised-2); padding: 2px; }
-.region .bubble { background: var(--c); color: var(--c-ink); }
-.region[aria-pressed="true"] .ring { background: var(--c); padding: 3px; }
-.region[aria-pressed="true"] .bubble { background: var(--c); color: var(--c-ink); }
-.region[aria-pressed="true"] .lab { font-weight: 800; }
-/* 위쪽 학교 · 교과서 전환: 글자 탭 */
-.views { background: none; padding: 0; gap: 16px; }
-.views a { padding: 0 2px; min-height: 44px; border-radius: 0; font-size: 16px; font-weight: 700; color: var(--muted); }
-.views a[aria-current="page"] { background: none; color: var(--text); box-shadow: inset 0 -2px 0 var(--text); }
-/* 학교 목록: 한 줄에 중1 · 중2 · 중3 교과서. 별을 누르면 "내 학교"로 맨 위에 모인다 */
-.sec-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 16px 0 0; font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
-.sec-h .n { font-size: 14px; font-weight: 500; color: var(--muted); }
-.mine { padding-bottom: 6px; border-bottom: 1px solid var(--border); }
-.mine .s-row:last-child { border-bottom: 0; }
-.hint { margin: 2px 0 6px; font-size: 14px; color: var(--muted); }
+/* 학교 한 줄: 이름, 중1 · 중2 · 중3 교과서, 내 학교 별 */
 .s-list { display: flex; flex-direction: column; }
 .s-row { position: relative; border-bottom: 1px solid var(--border); }
-.s-main { width: 100%; min-height: 68px; padding: 12px 0; border: 0; background: none; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: center; gap: 6px; border-radius: 8px; }
-.s-main:hover .s-name b { text-decoration: underline; text-underline-offset: 3px; }
+.s-main { width: 100%; min-height: 72px; padding: 13px 0; border: 0; background: none; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: center; gap: 6px; border-radius: 8px; }
 .s-name { display: flex; align-items: baseline; gap: 8px; padding-right: 40px; }
-.s-name b { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+.s-name b { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+.s-main:hover .s-name b { text-decoration: underline; text-underline-offset: 3px; }
 .s-reg { font-size: 13px; color: var(--muted); }
 .s-books { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; font-size: 14px; color: var(--muted); }
 .s-b { display: flex; align-items: center; gap: 4px; min-width: 0; }
-.s-b i { flex: none; width: 7px; height: 7px; border-radius: 2px; background: var(--c, var(--muted)); }
+.s-b i, .dot { flex: none; width: 8px; height: 8px; border-radius: 2px; background: var(--c, var(--muted)); }
 .s-b .tx { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .s-b.none { opacity: .6; }
-.s-row .star { position: absolute; top: 2px; right: -8px; }
+.star { position: absolute; top: 4px; right: -8px; }
 .star svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; color: var(--muted); }
 .star[aria-pressed="true"] svg { fill: currentColor; color: var(--accent); }
-.count-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.vsw { display: flex; gap: 2px; flex: none; }
-.vsw .icon-btn { width: 40px; height: 40px; border-radius: 8px; color: var(--muted); }
-.vsw .icon-btn svg { width: 20px; height: 20px; }
-.vsw .icon-btn[aria-pressed="true"] { color: var(--text); background: var(--raised); }
-.mine-btn { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px 0 12px; border: 0; border-radius: 8px; background: var(--raised); font-size: 15px; font-weight: 700; cursor: pointer; }
-.mine-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
-.mine-btn[aria-pressed="true"] { background: var(--text); color: var(--ground); }
-.mine-btn[aria-pressed="true"] svg { fill: currentColor; }
-/* 어두운 화면: 검정 칸이 검은 바탕에 묻히지 않게 */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) [style*="--c: #111111"] { --c: #2b2b2b !important; }
-  :root:not([data-theme="light"]) .tile.extra { background: #2b2b2b; }
-}
-:root[data-theme="dark"] [style*="--c: #111111"] { --c: #2b2b2b !important; }
-:root[data-theme="dark"] .tile.extra { background: #2b2b2b; }
-/* 아래 탭 막대: 브리핑 화면과 같은 모양 */
+.mine { padding-bottom: 4px; }
+
+/* 교과서 한 줄 */
+.b-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 72px; padding: 13px 0; border: 0; border-bottom: 1px solid var(--border); background: none; text-align: left; cursor: pointer; }
+.b-row .sw { flex: none; width: 12px; height: 44px; border-radius: 4px; background: var(--c, var(--muted)); }
+.b-row .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.b-row b { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+.b-row:hover b { text-decoration: underline; text-underline-offset: 3px; }
+.b-row .sub { font-size: 14px; color: var(--muted); }
+.b-row .chev { flex: none; width: 20px; height: 20px; color: var(--muted); }
+
+/* 학교 화면 · 교과서 화면 */
+.page-h { padding: 18px 0 4px; display: flex; flex-direction: column; gap: 8px; }
+.page-h h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.25; text-wrap: balance; }
+.page-h .meta { font-size: 15px; color: var(--muted); }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--raised); color: var(--text); font-size: 15px; font-weight: 700; text-decoration: none; cursor: pointer; transition: transform .1s; }
+.btn:active { transform: scale(.97); }
+.btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.btn[aria-pressed="true"] { background: var(--text); color: var(--ground); }
+.btn[aria-pressed="true"] svg { fill: currentColor; }
+
+/* 학교 화면 맨 위: 세 학년 교과서 한눈에 */
+.glance { margin-top: 16px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.glance button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 14px; border: 0; border-top: 1px solid var(--border); background: none; text-align: left; cursor: pointer; }
+.glance button:first-child { border-top: 0; }
+.glance button:hover { background: var(--raised); }
+.glance .nm { flex: 1; min-width: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+.glance .nm small { display: block; font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.glance .chev { flex: none; width: 20px; height: 20px; color: var(--muted); }
+/* 학년 묶음: 학년 표시, 교과서 이름, 단원 줄 */
+.grade { margin-top: 26px; }
+.g-head { display: flex; align-items: center; gap: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--text); scroll-margin-top: 72px; }
+.g-tag { flex: none; min-width: 44px; height: 30px; padding: 0 9px; border-radius: 8px; background: var(--c, var(--text)); color: var(--c-ink, var(--ground)); display: inline-grid; place-items: center; font-size: 15px; font-weight: 800; }
+.g-head h2 { flex: 1; min-width: 0; font-size: 19px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.3; }
+.g-head h2 button { border: 0; background: none; padding: 0; min-height: 44px; font: inherit; color: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 4px; }
+.g-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; margin-top: 4px; font-size: 14px; color: var(--muted); }
+.g-sub a { display: inline-flex; align-items: center; min-height: 40px; color: var(--accent); font-weight: 600; text-underline-offset: 3px; }
+.g-note { margin-top: 8px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+.pill { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.pill.ok { background: var(--ok-bg); color: var(--ok-fg); }
+.pill.warn { background: var(--warn-bg); color: var(--warn-fg); }
+.pill.bad { background: var(--bad-bg); color: var(--bad-fg); }
+
+/* 단원 줄: 번호, 제목, 문법. 누르면 본문 제목 · 말하기 · 주제가 펼쳐진다 */
+.u { border-bottom: 1px solid var(--border); }
+.u summary { display: grid; grid-template-columns: 40px minmax(0, 1fr) 20px; gap: 8px; align-items: start; padding: 13px 0; cursor: pointer; list-style: none; }
+.u summary::-webkit-details-marker { display: none; }
+.u-no { font-size: 20px; font-weight: 800; line-height: 1.3; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.u-no.x { font-size: 13px; font-weight: 700; line-height: 1.5; color: var(--muted); padding-top: 4px; }
+.u-t { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.u-t b { font-size: 17px; font-weight: 700; line-height: 1.4; letter-spacing: -0.02em; }
+.u-g { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+.u-g mark { background: var(--raised); color: var(--text); border-radius: 6px; padding: 3px 8px; font-size: 15px; font-weight: 600; line-height: 1.4; }
+.u summary .chev { width: 20px; height: 20px; margin-top: 4px; color: var(--muted); transition: transform .15s; }
+.u[open] summary .chev { transform: rotate(180deg); }
+.u-more { margin: 0; padding: 0 0 14px 48px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.55; }
+.u-more div { display: flex; gap: 8px; }
+.u-more .k { flex: none; width: 44px; color: var(--muted); font-size: 14px; }
+.u-more div span:last-child { min-width: 0; }
+.u-more .btn { align-self: flex-start; margin-top: 4px; }
+
+/* 다음 학년도 교과서 · 쓰는 학교: 접어 두는 칸 */
+.fold { margin-top: 12px; border: 1px solid var(--border); border-radius: 12px; }
+.fold > summary { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 14px; cursor: pointer; list-style: none; font-size: 15px; font-weight: 700; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary span { flex: 1; min-width: 0; }
+.fold > summary .chev { flex: none; width: 20px; height: 20px; color: var(--muted); transition: transform .15s; }
+.fold[open] > summary .chev { transform: rotate(180deg); }
+.fold-in { padding: 0 14px 12px; }
+.fold-in .u:last-child { border-bottom: 0; }
+.users { display: flex; flex-direction: column; gap: 10px; font-size: 15px; }
+.users h3 { font-size: 14px; font-weight: 700; color: var(--muted); }
+.users .names { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.users .names button { min-height: 36px; padding: 0 12px; border: 0; border-radius: 8px; background: var(--raised); font-size: 15px; font-weight: 600; cursor: pointer; }
+
+/* 지도 보기 */
+.map-bar { display: flex; align-items: center; gap: 8px; padding: 8px 0 0; margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); }
+.map-bar .chips { flex: 1; min-width: 0; margin: 0; padding: 2px max(16px, env(safe-area-inset-right, 0px)) 2px 0; }
+.map { position: relative; z-index: 0; height: min(54vh, 520px); min-height: 300px; margin: 8px calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0; background: var(--raised); }
+@media (min-width: 752px) { .map { margin: 8px 0 0; border-radius: 12px; overflow: hidden; } }
+.map .skel { position: absolute; inset: 0; border-radius: 0; }
+.map .leaflet-container { width: 100%; height: 100%; font: inherit; background: var(--raised); }
+.map .leaflet-control-attribution { font-size: 11px; }
+.map .lbl { background: var(--ground); color: var(--text); border: 0; border-radius: 6px; padding: 2px 6px; font-size: 12px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.25); white-space: nowrap; }
+.map .lbl::before { display: none; }
+.map:not(.z-lbl) .lbl { display: none; }
+.map .mine-ring { stroke: var(--text); }
+.map-fail { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center; color: var(--muted); }
+.map-fail b { color: var(--text); font-size: 17px; }
+.map-card { margin-top: 10px; border: 1px solid var(--border); border-radius: 12px; padding: 0 12px; }
+.map-card .s-row { border-bottom: 0; }
+.map-card .star { right: -4px; }
+.map-card .addr { margin: 0 0 12px; font-size: 14px; color: var(--muted); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .map .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.9); } }
+:root[data-theme="dark"] .map .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.9); }
+
+/* 알림 · 바닥 글 · 자리 표시 · 아래 탭 막대 */
+.toast { position: fixed; left: 50%; bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 16px); transform: translate(-50%, 16px); opacity: 0; z-index: 60; background: var(--text); color: var(--ground); padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; pointer-events: none; transition: opacity .2s, transform .2s; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+footer { border-top: 1px solid var(--border); margin-top: 36px; padding-block: 20px 36px; color: var(--muted); font-size: 13px; line-height: 1.7; display: flex; flex-direction: column; gap: 6px; }
+.skel { display: block; border-radius: 10px; background: var(--raised); animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .55; } }
 .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--ground); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom, 0px); display: flex; justify-content: center; }
-.tabbar a { flex: 1; max-width: 160px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; }
+.tabbar a { flex: 1; max-width: 160px; height: var(--tab-h); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; }
 .tabbar a[aria-current="page"] { color: var(--text); }
 .tabbar svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .tabbar a[aria-current="page"] svg { fill: currentColor; }
 .tabbar a:active svg { transform: scale(.9); }
-.toast { bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 16px); }
-.top .title .logo { font-size: 21px; font-weight: 800; letter-spacing: -0.045em; }
-.top .title .logo b { color: var(--accent); font-weight: 800; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
@@ -315,23 +214,18 @@ footer p { margin: 0 0 4px; }
 <header class="top">
   <div class="gutter">
     <span id="back-slot"></span>
-    <div class="title" id="top-title">
-      <span class="logo">교과서<b>찾기</b></span>
-    </div>
-    <nav class="views" aria-label="찾는 방법">
-      <a href="#schools" id="v-schools">학교</a>
-      <a href="#books" id="v-books">교과서</a>
-    </nav>
+    <a class="logo" href="#schools" aria-label="교과서 찾기 처음으로">교과서<b>찾기</b></a>
   </div>
 </header>
 
-<main class="gutter" id="app" aria-live="polite">
-  <div class="regions" aria-hidden="true">
-    <span class="skel" style="width:66px;height:66px;border-radius:50%"></span><span class="skel" style="width:66px;height:66px;border-radius:50%"></span><span class="skel" style="width:66px;height:66px;border-radius:50%"></span><span class="skel" style="width:66px;height:66px;border-radius:50%"></span>
-  </div>
-  <span class="skel" style="height:40px"></span>
-  <div class="rows" aria-hidden="true">
-    <span class="skel" style="height:56px;margin-top:10px"></span><span class="skel" style="height:56px;margin-top:10px"></span><span class="skel" style="height:56px;margin-top:10px"></span>
+<main class="gutter" id="app">
+  <!-- 불러오는 동안: 검색 칸, 보기 고르기, 학교 줄 모양의 자리 표시 -->
+  <div aria-hidden="true">
+    <span class="skel" style="height:48px;margin-top:14px"></span>
+    <span class="skel" style="height:48px;margin-top:10px"></span>
+    <span class="skel" style="height:64px;margin-top:22px"></span>
+    <span class="skel" style="height:64px;margin-top:10px"></span>
+    <span class="skel" style="height:64px;margin-top:10px"></span>
   </div>
 </main>
 
@@ -354,23 +248,24 @@ footer p { margin: 0 0 4px; }
   var backSlot = document.getElementById("back-slot");
   var toastEl = document.getElementById("toast");
   var DATA = null;
-  var BOOKS = [];   // 정렬된 교과서 키
-  var state = { view: "schools", region: null, school: -1, year: "2026", grade: "1", tab: "grid", book: null, q: "", bq: "" };
+  var SER = {};        // 교과서 한 종(출판사|저자) → { publisher, author, vols: {"2022|1": true}, use: { 학년도: { 학년: [학교 번호] } } }
+  var SERKEYS = [];    // 2026학년도에 쓰는 학교가 많은 순
+  var REGIONS = [];
+  var state = { q: "", view: "list", region: "all", mgrade: "1", mbook: null, mpick: null };
   var ICON = {
     back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
-    grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>',
-    list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>',
-    people: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="9" cy="8" r="4"/><path d="M17 11a3 3 0 1 0 0-6M21 21v-2a4 4 0 0 0-3-3.9"/></svg>',
-    close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>',
+    map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></svg>',
+    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg>',
     star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.9l6-.8z"/></svg>',
-    prev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
-    next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>'
+    chev: '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+    right: '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>'
   };
 
-  // 단원 칸 색 [바탕, 글자, 형광펜] — 브리핑 카드와 같은 색
-  var PALETTE = [["#cc4210", "#ffffff", "#ffe14d"], ["#0b7a6b", "#ffffff", "#ffe14d"], ["#1659e6", "#ffffff", "#ffe14d"], ["#ffd23f", "#111111", "#ffffff"], ["#d6336c", "#ffffff", "#ffe14d"], ["#3d6b21", "#ffffff", "#ffe14d"], ["#111111", "#ffffff", "#ffe14d"]];
-  var REGIONC = { "경기 수원": PALETTE[2], "경기 오산": PALETTE[0], "경기 용인": PALETTE[1], "경기 화성": PALETTE[4] };
+  // 출판사 색 [바탕, 글자] — 브리핑 카드와 같은 색
+  var PALETTE = [["#cc4210", "#ffffff"], ["#0b7a6b", "#ffffff"], ["#1659e6", "#ffffff"], ["#ffd23f", "#111111"], ["#d6336c", "#ffffff"], ["#3d6b21", "#ffffff"], ["#6b7280", "#ffffff"]];
   function pubColor(pub) {
     pub = pub || "";
     if (/동아/.test(pub)) return PALETTE[0];
@@ -381,8 +276,7 @@ footer p { margin: 0 0 4px; }
     if (/지학사/.test(pub)) return PALETTE[3];
     return PALETTE[6];
   }
-  var GRADE = { "1": PALETTE[0], "2": PALETTE[1], "3": PALETTE[2] };
-  function paint(node, c) { node.style.setProperty("--c", c[0]); node.style.setProperty("--c-ink", c[1]); node.style.setProperty("--mk", c[2]); return node; }
+  function paint(node, c) { node.style.setProperty("--c", c[0]); node.style.setProperty("--c-ink", c[1]); return node; }
   function el(tag, cls, text) {
     var e = document.createElement(tag);
     if (cls) e.className = cls;
@@ -402,578 +296,545 @@ footer p { margin: 0 0 4px; }
     if (at >= 0) a.splice(at, 1); else a.push(code);
     store("mine", JSON.stringify(a));
     toast(at >= 0 ? "내 학교에서 뺐습니다" : "내 학교에 넣었습니다");
-    return at < 0;
   }
   function toast(msg) { toastEl.textContent = msg; toastEl.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(function () { toastEl.classList.remove("on"); }, 1600); }
   function regionShort(r) { return r.replace(/^경기\s*/, ""); }
   function shortSchool(s) { return s.replace(/중학교$/, "중"); }
   function shortPub(p) { return p.replace(/출판$|출판사$|교과서$|교육$/, "").replace("NE능률", "능률"); }
   function bookKey(t, g) { return [t.publisher, t.author, t.curriculum, g].join("|"); }
-  function bookName(b) { return shortPub(b.publisher) + " " + b.author; }
-  function unitLabel(no) { return /^S/.test(no) ? "번외 " + no.slice(1) : no + "과"; }
-  function isExtra(u) { return /^S/.test(u.no); }
-  function monogram(name) { return (name || "?").replace(/^(경기|서울)\s*/, "").charAt(0); }
-  function statusPill(s) { return el("span", "pill " + (s === "학교 확인" ? "ok" : s === "블로그 확인" ? "warn" : "bad"), s); }
-  function copyText(text, btn) {
-    function ok() { toast("복사했습니다"); }
-    function fail() {
-      var r = document.createRange(); var tgt = btn.closest(".sheet, .li"); if (!tgt) return;
-      r.selectNodeContents(tgt.querySelector(".copy-src") || tgt);
-      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); toast("글자를 선택했습니다. 길게 눌러 복사하세요");
-    }
+  function serKey(t) { return t.publisher + "|" + t.author; }
+  function unitLabel(no) { return /^S/.test(no) ? "번외" : no; }
+  function yearOf(s) { return s.years["2026"] || s.years[Object.keys(s.years).sort()[0]] || {}; }
+  function norm(x) { return (x || "").replace(/\s/g, "").toLowerCase(); }
+  function copyText(text) {
+    function fail() { toast("복사하지 못했습니다. 글자를 길게 눌러 복사하세요"); }
     try {
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fail); else fail();
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { toast("복사했습니다"); }, fail); else fail();
     } catch (e) { fail(); }
   }
   function unitText(b, u) {
-    return bookName(b) + " 중" + b.grade + " " + unitLabel(u.no) + " " + (u.title || "") +
+    return b.publisher + " " + b.author + " 중" + b.grade + " " + (/^S/.test(u.no) ? "번외" : u.no + "과") + " " + (u.title || "") +
       (u.reading ? "\n본문 제목: " + u.reading : "") +
       "\n문법: " + (u.grammar.join(", ") || "-") +
       (u.functions.length ? "\n의사소통 기능: " + u.functions.join(", ") : "") +
       (u.theme ? "\n주제: " + u.theme : "");
   }
-  // 이 교과서를 쓰는 학교 { 연도: { 지역: [학교] } }
-  function usedBy(key) {
-    var out = {};
-    DATA.schools.forEach(function (s) {
-      Object.keys(s.years).forEach(function (y) {
-        Object.keys(s.years[y]).forEach(function (g) {
-          if (bookKey(s.years[y][g], g) !== key) return;
-          var r = out[y] || (out[y] = {});
-          (r[s.region] || (r[s.region] = [])).push(shortSchool(s.school));
-        });
-      });
-    });
-    return out;
-  }
-  function usedCount(key) {
-    var n = 0, u = usedBy(key);
-    var seen = {};
-    Object.keys(u).forEach(function (y) { Object.keys(u[y]).forEach(function (r) { u[y][r].forEach(function (s) { seen[r + s] = 1; }); }); });
-    Object.keys(seen).forEach(function () { n++; });
-    return n;
-  }
 
-  /* 맨 위 막대: 뒤로 버튼 */
-  function setBack(fn, label) {
+  /* 화면 이동: 주소의 # 가 곧 화면이다 (휴대폰 뒤로 가기가 그대로 동작) */
+  var moved = 0, homeY = 0, onHome = false;
+  function nav(h) { if (onHome) homeY = window.scrollY; moved++; location.hash = h; }
+  function goBack() { if (moved > 0) { moved--; history.back(); } else location.hash = "#schools"; }
+  function setBack(on) {
     backSlot.textContent = "";
-    if (!fn) return;
-    var b = iconBtn("back", label);
-    b.addEventListener("click", fn);
+    if (!on) return;
+    var b = iconBtn("back", "뒤로");
+    b.addEventListener("click", goBack);
     backSlot.appendChild(b);
   }
-
-  /* 학교 찾기 */
-  function renderSchoolSearch() {
-    setBack(null);
-    app.textContent = "";
-    app.appendChild(el("h1", "sr", "학교로 영어 교과서 찾기"));
-    var regions = [];
-    DATA.schools.forEach(function (s) { if (regions.indexOf(s.region) < 0) regions.push(s.region); });
-    if (!state.region || regions.indexOf(state.region) < 0) state.region = regions[0];
-    var mineBox = el("div");
-    app.appendChild(mineBox);
-
-    // 학교 한 줄: 이름, 중1 · 중2 · 중3 교과서, 내 학교 별
-    function schoolRow(i, showRegion) {
-      var s = DATA.schools[i];
-      var y = s.years["2026"] || s.years[Object.keys(s.years).sort()[0]] || {};
-      var row = el("div", "s-row");
-      var main = el("button", "s-main"); main.type = "button";
-      var nm = el("span", "s-name");
-      nm.appendChild(el("b", null, shortSchool(s.school)));
-      if (showRegion) nm.appendChild(el("span", "s-reg", regionShort(s.region)));
-      main.appendChild(nm);
-      var bk = el("span", "s-books"), said = [];
-      ["1", "2", "3"].forEach(function (g) {
-        var t = y[g];
-        var c = el("span", "s-b" + (t ? "" : " none"));
-        if (t) { var dot = el("i"), pc = pubColor(t.publisher); if (pc !== PALETTE[6]) paint(dot, pc); c.appendChild(dot); }
-        c.appendChild(el("span", "tx", g + " " + (t ? shortPub(t.publisher) + " " + t.author : "공개 안 됨")));
-        bk.appendChild(c);
-        said.push("중" + g + " " + (t ? t.publisher + " " + t.author : "공개 안 됨"));
-      });
-      main.appendChild(bk);
-      main.setAttribute("aria-label", s.school + ", " + said.join(", "));
-      main.addEventListener("click", function () { openSchool(i); });
-      row.appendChild(main);
-      var st = iconBtn("star", ""); st.classList.add("star");
-      st.setAttribute("data-star", s.code);
-      function sync() { var on = isMine(s.code); st.setAttribute("aria-pressed", String(on)); st.setAttribute("aria-label", s.school + (on ? " 내 학교에서 빼기" : " 내 학교에 넣기")); }
-      sync();
-      st.addEventListener("click", function () {
-        var before = st.getBoundingClientRect().top;
-        toggleMine(s.code);
-        fillMine();
-        var hint = app.querySelector(".hint");
-        if (hint && getMine().length) hint.remove();
-        app.querySelectorAll('[data-star="' + s.code + '"]').forEach(function (b) { var on = isMine(s.code); b.setAttribute("aria-pressed", String(on)); b.setAttribute("aria-label", s.school + (on ? " 내 학교에서 빼기" : " 내 학교에 넣기")); });
-        // 위쪽 "내 학교" 높이가 바뀌어도 누른 줄이 제자리에 있게 한다
-        if (st.isConnected) window.scrollBy(0, st.getBoundingClientRect().top - before);
-      });
-      row.appendChild(st);
-      return row;
+  function route() {
+    if (!DATA) return;
+    dropMap();
+    var h = location.hash, m;
+    try { h = decodeURIComponent(h); } catch (e) {}
+    if ((m = /^#s-(\d+)$/.exec(h))) {
+      var i = DATA.schools.findIndex(function (s) { return s.code === m[1]; });
+      if (i >= 0) { onHome = false; renderSchool(i); window.scrollTo(0, 0); return; }
     }
-    function fillMine() {
-      mineBox.textContent = "";
-      mineBox.className = "";
-      if (state.q.replace(/\s/g, "")) return;
-      var mine = getMine().map(function (code) { return DATA.schools.findIndex(function (s) { return s.code === code; }); }).filter(function (i) { return i >= 0; });
-      if (!mine.length) return;
-      mineBox.className = "mine";
-      var h = el("h2", "sec-h", "내 학교");
-      h.appendChild(el("span", "n", mine.length + "곳"));
-      mineBox.appendChild(h);
-      var l = el("div", "s-list");
-      mine.forEach(function (i) { l.appendChild(schoolRow(i, true)); });
-      mineBox.appendChild(l);
-    }
-    fillMine();
-    var rr = el("div", "regions");
-    rr.setAttribute("role", "group");
-    rr.setAttribute("aria-label", "지역");
-    regions.forEach(function (r) {
-      var n = DATA.schools.filter(function (s) { return s.region === r; }).length;
-      var b = paint(el("button", "region"), REGIONC[r] || PALETTE[6]);
-      b.type = "button";
-      b.setAttribute("aria-pressed", String(r === state.region));
-      b.setAttribute("aria-label", regionShort(r) + " 학교 " + n + "곳");
-      var ring = el("span", "ring"); ring.appendChild(el("span", "bubble", regionShort(r))); b.appendChild(ring);
-      b.appendChild(el("span", "lab", n + "곳"));
-      b.addEventListener("click", function () { state.region = r; store("region", r); renderSchoolSearch(); });
-      rr.appendChild(b);
+    if (h.indexOf("#b-") === 0 && SER[h.slice(3)]) { onHome = false; renderBook(h.slice(3)); window.scrollTo(0, 0); return; }
+    var back = !onHome;
+    onHome = true;
+    renderHome();
+    if (back) window.scrollTo(0, homeY);
+  }
+  window.addEventListener("hashchange", route);
+
+  /* 지도: 지도 보기를 열 때만 Leaflet 과 OpenStreetMap 지도 그림을 불러온다 */
+  var LEAFLET = "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet";
+  var LEAFLET_SRI = { js: "sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH", css: "sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" };
+  var leafletP = null, MAP = null;
+  function loadLeaflet() {
+    if (window.L) return Promise.resolve();
+    if (leafletP) return leafletP;
+    leafletP = new Promise(function (ok, fail) {
+      var c = document.createElement("link"); c.rel = "stylesheet"; c.href = LEAFLET + ".css"; c.integrity = LEAFLET_SRI.css; c.crossOrigin = "anonymous";
+      document.head.appendChild(c);
+      var j = document.createElement("script"); j.src = LEAFLET + ".js"; j.integrity = LEAFLET_SRI.js; j.crossOrigin = "anonymous";
+      j.onload = function () { if (window.L) ok(); else { leafletP = null; fail(); } };
+      j.onerror = function () { leafletP = null; j.remove(); fail(); };
+      document.head.appendChild(j);
     });
-    app.appendChild(rr);
+    return leafletP;
+  }
+  function dropMap() { if (MAP) { try { MAP.remove(); } catch (e) {} MAP = null; } }
+
+  /* 학교 한 줄 */
+  function schoolRow(i, showRegion, onStar) {
+    var s = DATA.schools[i], y = yearOf(s);
+    var row = el("div", "s-row");
+    var main = el("button", "s-main"); main.type = "button";
+    var nm = el("span", "s-name");
+    nm.appendChild(el("b", null, shortSchool(s.school)));
+    if (showRegion) nm.appendChild(el("span", "s-reg", regionShort(s.region)));
+    main.appendChild(nm);
+    var bk = el("span", "s-books"), said = [];
+    ["1", "2", "3"].forEach(function (g) {
+      var t = y[g];
+      var c = el("span", "s-b" + (t ? "" : " none"));
+      if (t) c.appendChild(paint(el("i"), pubColor(t.publisher)));
+      c.appendChild(el("span", "tx", g + " " + (t ? shortPub(t.publisher) + " " + t.author : "자료 없음")));
+      bk.appendChild(c);
+      said.push("중" + g + " " + (t ? t.publisher + " " + t.author : "자료 없음"));
+    });
+    main.appendChild(bk);
+    main.setAttribute("aria-label", s.school + ", " + said.join(", "));
+    main.addEventListener("click", function () { nav("#s-" + s.code); });
+    row.appendChild(main);
+    var st = iconBtn("star", ""); st.classList.add("star");
+    st.setAttribute("data-star", s.code);
+    function sync(b) { var on = isMine(s.code); b.setAttribute("aria-pressed", String(on)); b.setAttribute("aria-label", s.school + (on ? " 내 학교에서 빼기" : " 내 학교에 넣기")); }
+    sync(st);
+    st.addEventListener("click", function () {
+      var before = st.getBoundingClientRect().top, inMine = !!st.closest(".mine");
+      toggleMine(s.code);
+      if (onStar) onStar();
+      app.querySelectorAll('[data-star="' + s.code + '"]').forEach(sync);
+      // 위쪽 "내 학교" 높이가 바뀌어도 누른 줄이 제자리에 있게 한다
+      var now = st.isConnected ? st : app.querySelector((inMine ? ".mine " : ".s-list:not(.mine) ") + '[data-star="' + s.code + '"]');
+      if (now) window.scrollBy(0, now.getBoundingClientRect().top - before);
+    });
+    row.appendChild(st);
+    return row;
+  }
+
+  /* 교과서 한 줄: 한 종(출판사 · 저자)에 학년별 쓰는 학교 수 */
+  function seriesCount(k, y, g) { var u = SER[k].use[y]; return u && u[g] ? u[g].length : 0; }
+  function seriesTotal(k) {
+    var seen = {}, u = SER[k].use["2026"] || {};
+    Object.keys(u).forEach(function (g) { u[g].forEach(function (i) { seen[i] = 1; }); });
+    return Object.keys(seen).length;
+  }
+  function seriesRow(k) {
+    var sr = SER[k];
+    var b = paint(el("button", "b-row"), pubColor(sr.publisher)); b.type = "button";
+    b.appendChild(el("span", "sw"));
+    var t = el("span", "t");
+    t.appendChild(el("b", null, sr.publisher + " " + sr.author));
+    var parts = ["1", "2", "3"].map(function (g) { var n = seriesCount(k, "2026", g); return n ? "중" + g + " " + n + "곳" : null; }).filter(Boolean);
+    if (!parts.length) { var n27 = seriesCount(k, "2027", "3"); if (n27) parts.push("2027 중3 " + n27 + "곳"); }
+    // 2015 개정 책만 있는 종(중3 전용)은 2026학년도까지만 쓰인다
+    var only2015 = sr.cur["2015"] && !sr.cur["2022"];
+    t.appendChild(el("span", "sub", (parts.join(" · ") || "쓰는 학교 없음") + (only2015 ? " · 2026학년도까지" : "")));
+    b.appendChild(t);
+    b.insertAdjacentHTML("beforeend", ICON.right);
+    b.addEventListener("click", function () { nav("#b-" + encodeURIComponent(k)); });
+    return b;
+  }
+
+  /* 처음 화면: 검색, 보기(학교 · 지도 · 교과서), 지역 */
+  function renderHome() {
+    setBack(false);
+    app.textContent = "";
+    app.appendChild(el("h1", "sr", "학교별 영어 교과서 찾기"));
 
     var box = el("label", "search");
     box.innerHTML = ICON.search;
-    var inp = el("input"); inp.type = "search"; inp.id = "school-q"; inp.placeholder = "학교 이름 검색 (모든 지역)"; inp.value = state.q; inp.autocomplete = "off";
-    inp.setAttribute("aria-label", "학교 이름 검색");
+    var inp = el("input"); inp.type = "search"; inp.id = "q"; inp.value = state.q; inp.autocomplete = "off"; inp.enterKeyHint = "search";
+    inp.placeholder = "학교나 교과서 이름"; inp.setAttribute("aria-label", "학교나 교과서 이름으로 찾기");
     box.appendChild(inp);
     app.appendChild(box);
-    var rows = el("div", "rows");
-    app.appendChild(rows);
+
+    var seg = el("div", "seg"); seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "보는 방법");
+    [["list", "학교", "list"], ["map", "지도", "map"], ["books", "교과서", "book"]].forEach(function (v) {
+      var b = el("button"); b.type = "button"; b.innerHTML = ICON[v[2]]; b.appendChild(el("span", null, v[1]));
+      b.setAttribute("aria-pressed", String(state.view === v[0]));
+      b.addEventListener("click", function () { state.view = v[0]; store("view", v[0]); renderHome(); });
+      seg.appendChild(b);
+    });
+    app.appendChild(seg);
+
+    var body = el("div");
+    app.appendChild(body);
+
+    function regionChips() {
+      var cr = el("div", "chips"); cr.setAttribute("role", "group"); cr.setAttribute("aria-label", "지역");
+      [["all", "전체", DATA.schools.length]].concat(REGIONS.map(function (r) { return [r, regionShort(r), DATA.schools.filter(function (s) { return s.region === r; }).length]; })).forEach(function (r) {
+        var b = el("button", "chip"); b.type = "button";
+        b.appendChild(el("span", null, r[1])); b.appendChild(el("span", "n", r[2] + "곳"));
+        b.setAttribute("aria-pressed", String(state.region === r[0]));
+        b.addEventListener("click", function () { state.region = r[0]; store("region", r[0]); state.mpick = null; fill(); });
+        cr.appendChild(b);
+      });
+      return cr;
+    }
     function fill() {
-      rows.textContent = "";
-      var q = state.q.replace(/\s/g, "");
+      dropMap();
+      body.textContent = "";
+      var q = norm(state.q);
+      var sers = SERKEYS.filter(function (k) { var sr = SER[k]; return !q || norm(sr.publisher + sr.author).indexOf(q) >= 0 || norm(shortPub(sr.publisher) + sr.author).indexOf(q) >= 0; });
       var list = DATA.schools.map(function (s, i) { return i; }).filter(function (i) {
         var s = DATA.schools[i];
-        return q ? s.school.replace(/\s/g, "").indexOf(q) >= 0 : s.region === state.region;
+        return q ? norm(s.school).indexOf(q) >= 0 || norm(regionShort(s.region)) === q : state.region === "all" || s.region === state.region;
       });
-      var asGrid = recall("sview") === "grid";
-      var cr = el("div", "count count-row");
-      cr.appendChild(el("span", null, q ? "검색 결과 " + list.length + "곳" : regionShort(state.region) + " 중학교 " + list.length + "곳"));
-      var sw = el("div", "vsw"); sw.setAttribute("role", "group"); sw.setAttribute("aria-label", "보는 방법");
-      [["list", "목록으로 보기"], ["grid", "색 격자로 보기"]].forEach(function (v) {
-        var vb = iconBtn(v[0], v[1]);
-        vb.setAttribute("aria-pressed", String((v[0] === "grid") === asGrid));
-        vb.addEventListener("click", function () { store("sview", v[0]); fill(); });
-        sw.appendChild(vb);
-      });
-      cr.appendChild(sw);
-      rows.appendChild(cr);
-      if (!q && !getMine().length) rows.appendChild(el("p", "hint", "학교 이름 옆 별을 누르면 \"내 학교\"로 맨 위에 모입니다."));
-      if (!list.length) { var e = el("div", "empty"); e.appendChild(el("b", null, "찾는 학교가 없습니다")); e.appendChild(el("span", null, "학교 이름 일부만 넣어 보세요. 예: 동탄, 광교")); rows.appendChild(e); }
-      if (!asGrid) {
-        var sl = el("div", "s-list");
-        list.forEach(function (i) { sl.appendChild(schoolRow(i, !!q)); });
-        if (list.length) rows.appendChild(sl);
+
+      if (state.region === "all" || q) list.sort(function (a, b) { return DATA.schools[a].school.localeCompare(DATA.schools[b].school, "ko"); });
+      if (state.view === "books") {
+        if (!sers.length) { body.appendChild(empty("찾는 교과서가 없습니다", "출판사나 저자 이름 일부만 넣어 보세요. 예: 동아, 윤정미")); return; }
+        var h = el("h2", "sec-h", q ? "찾은 교과서" : "교과서"); h.appendChild(el("span", "n", sers.length + "종 · 쓰는 학교가 많은 순")); body.appendChild(h);
+        sers.forEach(function (k) { body.appendChild(seriesRow(k)); });
         return;
       }
-      var grid = el("div", "explore");
-      list.forEach(function (i) {
-        var s = DATA.schools[i];
-        var y = s.years["2026"] || s.years[Object.keys(s.years).sort()[0]] || {};
-        var g1 = y["1"];
-        var b = paint(el("button", "xt"), pubColor(g1 && g1.publisher)); b.type = "button";
-        b.setAttribute("aria-label", s.school + (g1 ? ", 중1 " + g1.publisher + " " + g1.author : ""));
-        b.appendChild(el("span", "nm", shortSchool(s.school)));
-        var sub = el("span", "sub");
-        if (q) sub.appendChild(el("span", "meta", regionShort(s.region)));
-        if (g1) sub.appendChild(el("mark", null, "중1 " + shortPub(g1.publisher) + " " + g1.author));
-        b.appendChild(sub);
-        b.addEventListener("click", function () { openSchool(i); });
-        grid.appendChild(b);
-      });
-      if (list.length) rows.appendChild(grid);
+      if (!q) body.appendChild(regionChips());
+      if (state.view === "map") {
+        if (!list.length) { body.appendChild(empty("찾는 학교가 없습니다", "학교 이름 일부만 넣어 보세요. 예: 동탄, 광교")); return; }
+        fillMap(body, list, !!q);
+        return;
+      }
+      // 학교 보기
+      var mine = q ? [] : getMine().map(function (code) { return DATA.schools.findIndex(function (s) { return s.code === code; }); }).filter(function (i) { return i >= 0; });
+      if (mine.length) {
+        var mh = el("h2", "sec-h", "내 학교"); mh.appendChild(el("span", "n", mine.length + "곳")); body.appendChild(mh);
+        var ml = el("div", "s-list mine");
+        mine.forEach(function (i) { ml.appendChild(schoolRow(i, true, fill)); });
+        body.appendChild(ml);
+      }
+      if (q && sers.length && sers.length < SERKEYS.length) {
+        var bh = el("h2", "sec-h", "교과서"); bh.appendChild(el("span", "n", sers.length + "종")); body.appendChild(bh);
+        sers.forEach(function (k) { body.appendChild(seriesRow(k)); });
+      }
+      if (!list.length) {
+        if (!(q && sers.length)) body.appendChild(empty("찾는 학교가 없습니다", "학교 이름 일부만 넣어 보세요. 예: 동탄, 광교"));
+        return;
+      }
+      var lh = el("h2", "sec-h", q ? "학교" : (state.region === "all" ? "모든 학교" : regionShort(state.region) + " 학교"));
+      lh.appendChild(el("span", "n", list.length + "곳")); body.appendChild(lh);
+      if (!q && !mine.length) body.appendChild(el("p", "hint", "별을 누르면 \"내 학교\"로 맨 위에 모입니다. 줄의 1 · 2 · 3 은 학년입니다."));
+      var sl = el("div", "s-list");
+      list.forEach(function (i) { sl.appendChild(schoolRow(i, !!q || state.region === "all", fill)); });
+      body.appendChild(sl);
     }
-    inp.addEventListener("input", function () { state.q = inp.value; fillMine(); fill(); });
+    function empty(title, sub) { var e = el("div", "empty"); e.appendChild(el("b", null, title)); e.appendChild(el("span", null, sub)); return e; }
+    inp.addEventListener("input", function () { state.q = inp.value; state.mpick = null; fill(); });
     fill();
   }
 
-  function openSchool(i) {
-    state.school = i;
-    store("school", DATA.schools[i].code || "");
-    nav("#s-" + (DATA.schools[i].code || ""));
+  /* 지도 보기: list 는 지금 지역(또는 검색 결과)의 학교 번호들 */
+  function fillMap(body, list, searching) {
+    var inList = {};
+    list.forEach(function (i) { inList[i] = true; });
+    var bar = el("div", "map-bar");
+    var seg = el("div", "seg small"); seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "점 색으로 볼 학년");
+    var segBtns = {};
+    ["1", "2", "3"].forEach(function (g) {
+      var b = el("button", null, "중" + g); b.type = "button";
+      b.addEventListener("click", function () { state.mgrade = g; state.mbook = null; store("mgrade", g); paintAll(); });
+      seg.appendChild(b); segBtns[g] = b;
+    });
+    bar.appendChild(seg);
+    var legend = el("div", "chips"); legend.setAttribute("role", "group"); legend.setAttribute("aria-label", "교과서로 골라 보기");
+    bar.appendChild(legend);
+    body.appendChild(bar);
+    var box = el("div", "map");
+    box.appendChild(el("span", "skel"));
+    body.appendChild(box);
+    var card = el("div");
+    body.appendChild(card);
+    body.appendChild(el("p", "hint", "점 색은 고른 학년 교과서의 출판사입니다. 교과서 이름을 누르면 그 책을 쓰는 학교만 남고, 점을 누르면 그 학교가 지도 아래에 나옵니다. 학교 위치는 한국교육시설안전원 전국초중등학교위치표준데이터(2026-10-01 기준), 지도 그림은 OpenStreetMap 입니다. 지도를 열 때만 OpenStreetMap 과 jsDelivr 에 연결합니다."));
+
+    var marks = {};   // 학교 번호 → { dot, ring }
+    function bookOf(i) { var t = yearOf(DATA.schools[i])[state.mgrade]; return t ? serKey(t) : null; }
+    function pick(i) {
+      var s = DATA.schools[i];
+      state.mpick = s.code;
+      card.textContent = ""; card.className = "map-card";
+      card.appendChild(schoolRow(i, true));
+      if (s.addr) card.appendChild(el("p", "addr", s.addr));
+      Object.keys(marks).forEach(function (k) { marks[k].dot.setStyle({ weight: +k === i ? 4 : 2 }); });
+      if (marks[i]) marks[i].dot.bringToFront();
+    }
+    function paintAll() {
+      Object.keys(segBtns).forEach(function (g) { segBtns[g].setAttribute("aria-pressed", String(g === state.mgrade)); });
+      var counts = {}, order = [];
+      list.forEach(function (i) { var k = bookOf(i); if (!k) return; if (!counts[k]) { counts[k] = 0; order.push(k); } counts[k]++; });
+      order.sort(function (a, b) { return counts[b] - counts[a] || a.localeCompare(b, "ko"); });
+      if (state.mbook && !counts[state.mbook]) state.mbook = null;
+      legend.textContent = "";
+      order.forEach(function (k) {
+        var p = k.split("|");
+        var b = el("button", "chip"); b.type = "button";
+        b.appendChild(paint(el("i"), pubColor(p[0])));
+        b.appendChild(el("span", null, shortPub(p[0]) + " " + p[1]));
+        b.appendChild(el("span", "n", counts[k] + "곳"));
+        b.setAttribute("aria-pressed", String(state.mbook === k));
+        b.setAttribute("aria-label", p[0] + " " + p[1] + " " + counts[k] + "곳" + (state.mbook === k ? ", 골라 보는 중" : ", 이 교과서만 보기"));
+        b.addEventListener("click", function () { state.mbook = state.mbook === k ? null : k; paintAll(); });
+        legend.appendChild(b);
+      });
+      Object.keys(marks).forEach(function (key) {
+        var i = +key, k = bookOf(i), on = !state.mbook || k === state.mbook;
+        var c = k ? pubColor(k.split("|")[0])[0] : "#9aa0a8";
+        marks[i].dot.setStyle({ fillColor: c, fillOpacity: on ? 1 : .18, opacity: on ? 1 : .25, radius: on ? 8 : 5 });
+        if (on) marks[i].dot.bringToFront();
+        if (marks[i].ring) marks[i].ring.setStyle({ opacity: on ? 1 : .25 });
+      });
+    }
+    paintAll();
+
+    loadLeaflet().then(function () {
+      if (!box.isConnected) return;
+      box.textContent = "";
+      var L = window.L;
+      MAP = L.map(box, { zoomControl: true });
+      MAP.attributionControl.setPrefix(false);
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
+      }).addTo(MAP);
+      var pts = [], mine = getMine();
+      DATA.schools.forEach(function (s, i) {
+        if (typeof s.lat !== "number") return;
+        if (searching && !inList[i]) return;
+        var ll = [s.lat, s.lng], m = {};
+        if (mine.indexOf(s.code) >= 0) m.ring = L.circleMarker(ll, { radius: 13, color: "#111111", weight: 2.5, fill: false, interactive: false, className: "mine-ring" }).addTo(MAP);
+        m.dot = L.circleMarker(ll, { radius: 8, color: "#ffffff", weight: 2, fillOpacity: 1 }).addTo(MAP);
+        m.dot.bindTooltip(shortSchool(s.school), { permanent: true, direction: "top", offset: [0, -8], className: "lbl" });
+        m.dot.on("click", function () { pick(i); });
+        marks[i] = m;
+        if (inList[i]) pts.push(ll);
+      });
+      function labels() { box.classList.toggle("z-lbl", MAP.getZoom() >= 14); }
+      MAP.on("zoomend", labels);
+      var focus = state.mpick ? DATA.schools.findIndex(function (s) { return s.code === state.mpick; }) : -1;
+      if (focus >= 0 && marks[focus]) { MAP.setView([DATA.schools[focus].lat, DATA.schools[focus].lng], 15); pick(focus); }
+      else if (pts.length) MAP.fitBounds(pts, { padding: [28, 28], maxZoom: 15 });
+      else MAP.setView([37.25, 127.05], 11);
+      labels();
+      paintAll();
+    }, function () {
+      if (!box.isConnected) return;
+      box.textContent = "";
+      var f = el("div", "map-fail");
+      f.appendChild(el("b", null, "지도를 불러오지 못했습니다"));
+      f.appendChild(el("span", null, "인터넷 연결을 확인하고 다시 눌러 보세요. 학교 보기는 그대로 쓸 수 있습니다."));
+      var rb = el("button", "btn", "다시 불러오기"); rb.type = "button";
+      rb.addEventListener("click", function () { renderHome(); });
+      f.appendChild(rb);
+      box.appendChild(f);
+    });
   }
 
-  /* 학교 프로필 */
-  function renderProfile() {
-    var s = DATA.schools[state.school];
-    setBack(function () { goBack("#schools"); }, "학교 목록으로");
+  /* 단원 줄들. 번호 · 제목 · 문법이 바로 보이고, 누르면 본문 제목 · 말하기 · 주제 */
+  function unitList(b) {
+    var wrap = el("div", "units");
+    b.units.forEach(function (u) {
+      var d = el("details", "u");
+      var sm = el("summary");
+      sm.appendChild(el("span", "u-no" + (/^S/.test(u.no) ? " x" : ""), unitLabel(u.no)));
+      var t = el("span", "u-t");
+      t.appendChild(el("b", null, u.title || "(제목 없음)"));
+      if (u.grammar.length) {
+        var g = el("span", "u-g");
+        u.grammar.forEach(function (x) { g.appendChild(el("mark", null, x)); });
+        t.appendChild(g);
+      }
+      sm.appendChild(t);
+      sm.insertAdjacentHTML("beforeend", ICON.chev);
+      sm.setAttribute("aria-label", (/^S/.test(u.no) ? "번외 단원" : u.no + "과") + " " + (u.title || "") + (u.grammar.length ? ", 문법 " + u.grammar.join(", ") : ""));
+      d.appendChild(sm);
+      var more = el("div", "u-more");
+      function line(k, v) { if (!v) return; var r = el("div"); r.appendChild(el("span", "k", k)); r.appendChild(el("span", null, v)); more.appendChild(r); }
+      line("본문", u.reading);
+      line("말하기", u.functions.join(" · "));
+      line("주제", u.theme);
+      var cp = el("button", "btn"); cp.type = "button"; cp.innerHTML = ICON.copy; cp.appendChild(el("span", null, "이 단원 복사"));
+      cp.addEventListener("click", function () { copyText(unitText(b, u)); });
+      more.appendChild(cp);
+      d.appendChild(more);
+      wrap.appendChild(d);
+    });
+    return wrap;
+  }
+  function fold(title, content, open) {
+    var d = el("details", "fold");
+    if (open) d.open = true;
+    var sm = el("summary"); sm.appendChild(el("span", null, title)); sm.insertAdjacentHTML("beforeend", ICON.chev);
+    d.appendChild(sm);
+    var inn = el("div", "fold-in"); inn.appendChild(content); d.appendChild(inn);
+    return d;
+  }
+  function statusPill(s) { return el("span", "pill " + (s === "블로그 확인" ? "warn" : "bad"), s); }
+  function bookLink(t) {
+    var b = el("button", null, t.publisher + " " + t.author); b.type = "button";
+    b.setAttribute("aria-label", t.publisher + " " + t.author + " 교과서 보기");
+    b.addEventListener("click", function () { nav("#b-" + encodeURIComponent(serKey(t))); });
+    return b;
+  }
+
+  /* 학교 화면: 중1 · 중2 · 중3 이 한 화면에 */
+  function renderSchool(i) {
+    var s = DATA.schools[i];
+    setBack(true);
     app.textContent = "";
     var years = Object.keys(s.years).sort();
-    if (years.indexOf(state.year) < 0) state.year = years[0];
-    var grades = s.years[state.year];
-    if (!grades[state.grade]) state.grade = ["1", "2", "3"].filter(function (g) { return grades[g]; })[0] || "1";
-    var t = grades[state.grade];
-    var key = t ? bookKey(t, state.grade) : null;
-    var b = key ? DATA.books[key] : null;
-
-    var pf = el("section", "profile");
-    pf.appendChild(el("div", "p-av", monogram(s.school)));
-    var m = el("div", "p-main");
-    var nm = el("div", "p-name");
-    nm.appendChild(el("h1", null, s.school));
-    if (years.length > 1) {
-      var ys = el("div", "years"); ys.setAttribute("role", "group"); ys.setAttribute("aria-label", "학년도");
-      years.forEach(function (y) {
-        var yb = el("button", "yr", y); yb.type = "button"; yb.setAttribute("aria-pressed", String(y === state.year));
-        yb.setAttribute("aria-label", y + "학년도");
-        yb.addEventListener("click", function () { state.year = y; renderProfile(); });
-        ys.appendChild(yb);
-      });
-      nm.appendChild(ys);
-    } else {
-      nm.appendChild(el("span", "pill neutral", years[0] + "학년도"));
-    }
-    var mb = el("button", "mine-btn"); mb.type = "button";
-    mb.innerHTML = ICON.star;
-    mb.appendChild(el("span", null, "내 학교"));
+    var base = s.years["2026"] ? "2026" : years[0];
+    var ph = el("header", "page-h");
+    ph.appendChild(el("h1", null, s.school));
+    ph.appendChild(el("p", "meta", regionShort(s.region) + (s.addr ? " · " + s.addr : "")));
+    var acts = el("div", "acts");
+    var mb = el("button", "btn"); mb.type = "button"; mb.innerHTML = ICON.star; mb.appendChild(el("span", null, "내 학교"));
     function syncMine() { var on = isMine(s.code); mb.setAttribute("aria-pressed", String(on)); mb.setAttribute("aria-label", on ? "내 학교에서 빼기" : "내 학교에 넣기"); }
     syncMine();
     mb.addEventListener("click", function () { toggleMine(s.code); syncMine(); });
-    nm.appendChild(mb);
-    m.appendChild(nm);
-    var st = el("ul", "stats");
-    function stat(n, label) { var li = el("li"); li.appendChild(el("b", null, String(n))); li.appendChild(el("span", null, label)); st.appendChild(li); }
-    if (b) {
-      var units = b.units.filter(function (u) { return !isExtra(u); });
-      stat(units.length, "단원");
-      stat(units.reduce(function (n, u) { return n + u.grammar.length; }, 0), "문법");
-      stat(usedCount(key), "같은 책 학교");
-    } else {
-      stat(Object.keys(grades).length, "학년 공개");
+    acts.appendChild(mb);
+    if (typeof s.lat === "number") {
+      var mv = el("button", "btn"); mv.type = "button"; mv.innerHTML = ICON.map; mv.appendChild(el("span", null, "지도에서 보기"));
+      mv.addEventListener("click", function () { state.view = "map"; store("view", "map"); state.mpick = s.code; state.q = ""; state.region = s.region; homeY = 0; onHome = false; nav("#schools"); });
+      acts.appendChild(mv);
     }
-    m.appendChild(st);
-    pf.appendChild(m);
+    ph.appendChild(acts);
+    app.appendChild(ph);
 
-    var bio = el("div", "bio");
-    var l1 = el("div", "b-line");
-    l1.appendChild(el("span", null, regionShort(s.region) + " · " + state.year + "학년도 중" + state.grade + " " + (t ? t.publisher + " " + t.author + " (" + t.curriculum + " 개정)" : "공개 안 됨")));
-    bio.appendChild(l1);
-    if (t) {
-      var l2 = el("div", "b-line");
-      l2.appendChild(statusPill(t.status));
-      if (t.source) { var a = el("a", null, t.status === "학교 확인" ? "학교 공지 보기" : "근거 글 보기"); a.href = t.source; a.target = "_blank"; a.rel = "noopener noreferrer"; l2.appendChild(a); }
-      if (b) l2.appendChild(el("span", "pill " + (b.verified ? "ok" : "warn"), b.verified ? "단원: 교과서 원문 확인" : "단원: 2차 자료"));
-      bio.appendChild(l2);
-      if (t.status === "추정") bio.appendChild(el("span", "muted", "이 학년도 목록이 공개되지 않아 전년도 목록으로 추정했습니다. 학교에 확인이 필요합니다."));
+    function gradeBlock(g) {
+      var t = (s.years[base] || {})[g];
+      var t27 = base === "2026" && s.years["2027"] ? s.years["2027"][g] : null;
+      var sec = el("section", "grade");
+      var head = el("div", "g-head");
+      head.appendChild(paint(el("span", "g-tag", "중" + g), t ? pubColor(t.publisher) : PALETTE[6]));
+      var h2 = el("h2");
+      if (t) h2.appendChild(bookLink(t)); else h2.textContent = "자료 없음";
+      head.appendChild(h2);
+      sec.appendChild(head);
+      if (!t) {
+        sec.appendChild(el("p", "g-note", base + "학년도 교과서 목록을 학교가 공개하지 않았거나 찾지 못했습니다."));
+      } else {
+        var sub = el("div", "g-sub");
+        sub.appendChild(el("span", null, base + "학년도 · " + t.curriculum + " 개정"));
+        if (t.status !== "학교 확인") sub.appendChild(statusPill(t.status));
+        if (t.source) { var a = el("a", null, t.status === "학교 확인" ? "학교 공지" : "근거 글"); a.href = t.source; a.target = "_blank"; a.rel = "noopener noreferrer"; sub.appendChild(a); }
+        sec.appendChild(sub);
+        if (t.status === "추정") sec.appendChild(el("p", "g-note", "이 학년도 목록이 공개되지 않아 전년도 목록으로 추정했습니다. 학교에 확인이 필요합니다."));
+        var b = DATA.books[bookKey(t, g)];
+        if (b) {
+          if (!b.verified) sec.appendChild(el("p", "g-note", "단원은 교과서 원문이 아니라 문제집 목차와 학원 정리 글을 맞춰 본 것입니다."));
+          sec.appendChild(unitList(b));
+        } else sec.appendChild(el("p", "g-note", "이 교과서는 단원을 아직 정리하지 않았습니다."));
+      }
+      if (t27 && (!t || bookKey(t27, g) !== bookKey(t, g))) {
+        var b27 = DATA.books[bookKey(t27, g)];
+        var inner = el("div");
+        var s27 = el("div", "g-sub"); s27.style.marginTop = "0";
+        s27.appendChild(el("span", null, t27.curriculum + " 개정"));
+        if (t27.source) { var a2 = el("a", null, "학교 공지"); a2.href = t27.source; a2.target = "_blank"; a2.rel = "noopener noreferrer"; s27.appendChild(a2); }
+        var lk = el("a", null, "교과서 보기"); lk.href = "#b-" + encodeURIComponent(serKey(t27)); lk.addEventListener("click", function (e) { e.preventDefault(); nav(lk.getAttribute("href")); }); s27.appendChild(lk);
+        inner.appendChild(s27);
+        if (b27) inner.appendChild(unitList(b27)); else inner.appendChild(el("p", "g-note", "이 교과서는 단원을 아직 정리하지 않았습니다."));
+        sec.appendChild(fold("2027학년도부터: " + t27.publisher + " " + t27.author, inner, !t));
+      }
+      return sec;
     }
-    pf.appendChild(bio);
-    app.appendChild(pf);
-
-    // 학년 동그라미
-    var hl = el("div", "highlights"); hl.setAttribute("role", "group"); hl.setAttribute("aria-label", "학년");
+    var glance = el("div", "glance"), blocks = {};
     ["1", "2", "3"].forEach(function (g) {
-      var tg = grades[g];
-      var hb = paint(el("button", "hl"), GRADE[g]); hb.type = "button";
-      hb.setAttribute("aria-pressed", String(g === state.grade));
-      hb.setAttribute("aria-label", "중" + g + " " + (tg ? tg.publisher + " " + tg.author : "공개 안 됨"));
-      var ring = el("span", "ring"); ring.appendChild(el("span", "bubble", "중" + g)); hb.appendChild(ring);
-      hb.appendChild(el("span", "lab", tg ? shortPub(tg.publisher) + " " + tg.author : "공개 안 됨"));
-      if (!tg) hb.disabled = true;
-      hb.addEventListener("click", function () { state.grade = g; renderProfile(); });
-      hl.appendChild(hb);
+      var t = (s.years[base] || {})[g];
+      var t27 = base === "2026" && s.years["2027"] ? s.years["2027"][g] : null;
+      var b = el("button"); b.type = "button";
+      b.appendChild(paint(el("span", "g-tag", "중" + g), t ? pubColor(t.publisher) : PALETTE[6]));
+      var nm = el("span", "nm", t ? t.publisher + " " + t.author : "자료 없음");
+      if (t27 && (!t || bookKey(t27, g) !== bookKey(t, g))) nm.appendChild(el("small", null, "2027학년도부터 " + t27.publisher + " " + t27.author));
+      b.appendChild(nm);
+      b.insertAdjacentHTML("beforeend", ICON.chev);
+      b.setAttribute("aria-label", "중" + g + " " + (t ? t.publisher + " " + t.author : "자료 없음") + ", 단원으로 내려가기");
+      b.addEventListener("click", function () { var h = blocks[g].querySelector(".g-head"); h.scrollIntoView({ block: "start" }); });
+      glance.appendChild(b);
     });
-    app.appendChild(hl);
-
-    renderBody(key, b, [["grid", "단원", "grid"], ["list", "문법 목록", "list"]]);
+    app.appendChild(glance);
+    if (base !== "2026") app.appendChild(el("p", "hint", "이 학교는 2026학년도 목록을 찾지 못해 " + base + "학년도 교과서를 보여 줍니다."));
+    ["1", "2", "3"].forEach(function (g) { blocks[g] = gradeBlock(g); app.appendChild(blocks[g]); });
   }
 
-  /* 격자 · 목록 · 쓰는 학교 탭 */
-  function renderBody(key, b, tabs) {
-    if (tabs.map(function (x) { return x[0]; }).indexOf(state.tab) < 0) state.tab = tabs[0][0];
-    var tl = el("div", "tabs"); tl.setAttribute("role", "tablist");
-    var panel = el("div"); panel.setAttribute("role", "tabpanel");
-    tabs.forEach(function (x) {
-      var tb = el("button", "tab"); tb.type = "button"; tb.setAttribute("role", "tab");
-      tb.setAttribute("aria-selected", String(x[0] === state.tab));
-      tb.innerHTML = ICON[x[2]]; tb.appendChild(el("span", null, x[1]));
-      tb.addEventListener("click", function () { state.tab = x[0]; store("tab", x[0]); tl.querySelectorAll(".tab").forEach(function (n) { n.setAttribute("aria-selected", String(n === tb)); }); fillPanel(); });
-      tl.appendChild(tb);
-    });
-    app.appendChild(tl);
-    app.appendChild(panel);
-    function fillPanel() {
-      panel.textContent = "";
-      if (state.tab === "users") return panel.appendChild(usersPanel(key));
-      if (!b) {
-        var e = el("div", "empty");
-        e.appendChild(el("b", null, key ? "단원 구성을 아직 정리하지 않았습니다" : "이 학년의 교과서가 공개되지 않았습니다"));
-        if (key) e.appendChild(el("span", null, "교과서 이름과 학교 공지만 확인된 교과서입니다."));
-        return panel.appendChild(e);
-      }
-      if (b.note) { var n = el("p", "count", b.note); panel.appendChild(n); }
-      panel.appendChild(state.tab === "list" ? unitList(b) : unitGrid(b));
-    }
-    fillPanel();
-  }
-
-  function unitGrid(b) {
-    var g = el("div", "grid");
-    b.units.forEach(function (u, k) {
-      var t = paint(el("button", "tile" + (isExtra(u) ? " extra" : "")), PALETTE[k % PALETTE.length]); t.type = "button";
-      t.setAttribute("aria-label", unitLabel(u.no) + " " + (u.title || "") + " 크게 보기");
-      var no = el("span", "no");
-      if (isExtra(u)) no.textContent = "번외 " + u.no.slice(1);
-      else { no.textContent = u.no; no.appendChild(el("small", null, "과")); }
-      t.appendChild(no);
-      var bot = el("span"); bot.style.display = "flex"; bot.style.flexDirection = "column"; bot.style.gap = "4px"; bot.style.minWidth = "0";
-      bot.appendChild(el("span", "t", u.title || "제목 미확인"));
-      if (u.grammar.length) bot.appendChild(el("mark", "g", u.grammar[0]));
-      t.appendChild(bot);
-      t.addEventListener("click", function () { openReels(b, k, t); });
-      g.appendChild(t);
-    });
-    return g;
-  }
-
-  function unitList(b) {
-    var l = el("div", "list");
-    b.units.forEach(function (u) {
-      var r = el("div", "li");
-      r.appendChild(el("div", "no" + (isExtra(u) ? " extra" : ""), isExtra(u) ? unitLabel(u.no) : u.no));
-      var body = el("div", "body copy-src");
-      body.appendChild(el("span", "t", u.title || "제목 미확인"));
-      if (u.reading) body.appendChild(el("span", "rd", "본문: " + u.reading));
-      var gr = el("span", "gr");
-      if (u.grammar.length) { gr.appendChild(el("b", null, "문법 ")); gr.appendChild(document.createTextNode(u.grammar.join(" · "))); }
-      else gr.textContent = isExtra(u) ? "문법 항목 없음" : "문법 미확인";
-      body.appendChild(gr);
-      if (u.functions.length) body.appendChild(el("span", "fn", "말하기: " + u.functions.join(" · ")));
-      if (u.theme) body.appendChild(el("span", "th", "주제: " + u.theme));
-      r.appendChild(body);
-      var c = el("button", "copy", "복사"); c.type = "button";
-      c.setAttribute("aria-label", unitLabel(u.no) + " 단원 정보 복사");
-      c.addEventListener("click", function () { copyText(unitText(b, u), c); });
-      r.appendChild(c);
-      l.appendChild(r);
-    });
-    return l;
-  }
-
-  function usersPanel(key) {
-    var u = usedBy(key);
-    var box = el("div", "users");
-    var ys = Object.keys(u).sort();
-    if (!ys.length) { var e = el("div", "empty"); e.appendChild(el("b", null, "확인된 학교가 아직 없습니다")); box.appendChild(e); return box; }
-    ys.forEach(function (y) {
-      var regs = Object.keys(u[y]).sort();
-      var total = regs.reduce(function (n, r) { return n + u[y][r].length; }, 0);
-      box.appendChild(el("h2", null, y + "학년도 " + total + "곳"));
-      regs.forEach(function (r) {
-        var p = el("p"); p.appendChild(el("b", null, regionShort(r))); p.appendChild(document.createTextNode(u[y][r].join(", "))); box.appendChild(p);
-      });
-    });
-    return box;
-  }
-
-  /* 단원 크게 보기: 세로로 한 장씩 넘기는 릴스 */
-  function openReels(b, k, from) {
-    var wrap = el("div", "ureels"); wrap.setAttribute("role", "dialog"); wrap.setAttribute("aria-modal", "true");
-    wrap.setAttribute("aria-label", bookName(b) + " 영어 " + b.grade + " 단원 보기");
-    var bar = el("div", "u-bar"), barIn = el("div", "u-bar-in");
-    barIn.appendChild(el("span", "ttl", bookName(b) + " · 영어 " + b.grade));
-    var x = iconBtn("close", "닫기"); barIn.appendChild(x); bar.appendChild(barIn);
-    var track = el("div", "u-track");
-    var list = [];
-    b.units.forEach(function (u, i) {
-      var r = paint(el("section", "ureel"), isExtra(u) ? ["#111111", "#ffffff", "#ffe14d"] : PALETTE[i % PALETTE.length]);
-      r.setAttribute("aria-label", unitLabel(u.no) + " " + (u.title || ""));
-      var inn = el("div", "ureel-in");
-      var big = el("div", "big");
-      if (isExtra(u)) big.textContent = "번외 " + u.no.slice(1); else { big.textContent = u.no; big.appendChild(el("small", null, "과")); }
-      inn.appendChild(big);
-      inn.appendChild(el("h2", null, u.title || "제목 미확인"));
-      if (u.reading) inn.appendChild(el("p", "rd", "본문 · " + u.reading));
-      var low = el("div", "low"), info = el("div", "info");
-      var g = el("div"); g.appendChild(el("div", "k", "핵심 문법"));
-      var gl = el("div", "gram");
-      (u.grammar.length ? u.grammar : [isExtra(u) ? "문법 항목 없음" : "확인 안 됨"]).forEach(function (t) { gl.appendChild(el("mark", null, t)); });
-      g.appendChild(gl); info.appendChild(g);
-      if (u.functions.length) { var f = el("div"); f.appendChild(el("div", "k", "의사소통 기능")); f.appendChild(el("div", "fns", u.functions.join(" · "))); info.appendChild(f); }
-      if (u.theme) { var th = el("div"); th.appendChild(el("div", "k", "주제")); th.appendChild(el("div", "fns", u.theme)); info.appendChild(th); }
-      low.appendChild(info);
-      var side = el("div", "side");
-      var c = el("button"); c.type = "button";
-      c.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>';
-      c.appendChild(el("span", null, "복사"));
-      c.setAttribute("aria-label", unitLabel(u.no) + " 단원 정보 복사");
-      c.addEventListener("click", function () { copyText(unitText(b, u), c); });
-      side.appendChild(c);
-      side.appendChild(el("span", "n", (i + 1) + "/" + b.units.length));
-      low.appendChild(side);
-      inn.appendChild(low);
-      r.appendChild(inn);
-      track.appendChild(r); list.push(r);
-    });
-    wrap.appendChild(track); wrap.appendChild(bar);
-    document.body.appendChild(wrap);
-    document.body.style.overflow = "hidden";
-    track.scrollTop = list[k].offsetTop;
-    function close() { if (!wrap.isConnected) return; wrap.remove(); document.body.style.overflow = ""; document.removeEventListener("keydown", onKey); if (from && from.isConnected) from.focus(); }
-    wrap.__close = close;
-    var pushed = false;
-    try { history.pushState({ unit: 1 }, "", (location.hash || "#schools") + "~u"); pushed = true; } catch (e) {}
-    function requestClose() { if (pushed && /~u$/.test(location.hash)) history.back(); else close(); }
-    function onKey(e) {
-      var at = Math.round(track.scrollTop / track.clientHeight);
-      if (e.key === "Escape") { e.preventDefault(); requestClose(); }
-      else if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === "ArrowRight") { e.preventDefault(); if (list[at + 1]) track.scrollTo({ top: list[at + 1].offsetTop, behavior: "smooth" }); }
-      else if (e.key === "ArrowUp" || e.key === "PageUp" || e.key === "ArrowLeft") { e.preventDefault(); if (list[at - 1]) track.scrollTo({ top: list[at - 1].offsetTop, behavior: "smooth" }); }
-      else if (e.key === "Tab") {
-        var fs = wrap.querySelectorAll("button"); if (!fs.length) return;
-        if (e.shiftKey && document.activeElement === fs[0]) { e.preventDefault(); fs[fs.length - 1].focus(); }
-        else if (!e.shiftKey && document.activeElement === fs[fs.length - 1]) { e.preventDefault(); fs[0].focus(); }
-      }
-    }
-    x.addEventListener("click", requestClose);
-    document.addEventListener("keydown", onKey);
-    x.focus();
-  }
-
-  /* 교과서 찾기 */
-  function renderBookSearch() {
-    setBack(null);
+  /* 교과서 화면: 한 종의 학년별 단원과 쓰는 학교 */
+  function renderBook(k) {
+    var sr = SER[k];
+    setBack(true);
     app.textContent = "";
-    app.appendChild(el("h1", "sr", "교과서로 찾기"));
-    var box = el("label", "search"); box.style.marginTop = "16px"; box.innerHTML = ICON.search;
-    var inp = el("input"); inp.type = "search"; inp.id = "book-q"; inp.placeholder = "출판사나 저자 검색"; inp.value = state.bq; inp.autocomplete = "off";
-    inp.setAttribute("aria-label", "출판사나 저자 검색");
-    box.appendChild(inp); app.appendChild(box);
-    var rows = el("div", "rows"); app.appendChild(rows);
-    // 학교 목록에는 있지만 단원 표가 없는 교과서도 함께 보여 준다
-    var all = {};
-    BOOKS.forEach(function (k) { all[k] = true; });
-    DATA.schools.forEach(function (s) { Object.keys(s.years).forEach(function (y) { Object.keys(s.years[y]).forEach(function (g) { all[bookKey(s.years[y][g], g)] = true; }); }); });
-    var keys = ALLKEYS;
-    function fill() {
-      rows.textContent = "";
-      var q = state.bq.replace(/\s/g, "");
-      var last = "", grid = null;
-      var shown = keys.filter(function (k) { return !q || k.replace(/[\s|]/g, "").indexOf(q) >= 0 || shortPub(k.split("|")[0]).indexOf(q) >= 0; });
-      shown.forEach(function (k) {
-        var p = k.split("|");
-        var grp = p[2] + " 개정 · 중" + p[3];
-        if (grp !== last) { rows.appendChild(el("h2", "group", grp)); grid = el("div", "explore"); rows.appendChild(grid); last = grp; }
-        var b = DATA.books[k];
-        var r = paint(el("button", "xt"), pubColor(p[0])); r.type = "button";
-        r.setAttribute("aria-label", p[0] + " " + p[1] + " 영어 " + p[3] + ", 학교 " + usedCount(k) + "곳");
-        r.appendChild(el("span", "nm", shortPub(p[0]) + " " + p[1]));
-        var t = el("span", "sub");
-        t.appendChild(el("mark", null, "영어 " + p[3] + (b ? "" : " · 단원 정리 전")));
-        t.appendChild(el("span", "meta", "학교 " + usedCount(k) + "곳"));
-        r.appendChild(t);
-        r.addEventListener("click", function () { state.tab = "grid"; nav("#b-" + ALLKEYS.indexOf(k)); });
-        grid.appendChild(r);
+    var ph = el("header", "page-h");
+    ph.appendChild(el("h1", null, sr.publisher + " " + sr.author));
+    var parts = ["1", "2", "3"].map(function (g) { var n = seriesCount(k, "2026", g); return n ? "중" + g + " " + n + "곳" : null; }).filter(Boolean);
+    ph.appendChild(el("p", "meta", "2026학년도 " + (parts.join(" · ") || "쓰는 학교 없음")));
+    app.appendChild(ph);
+    [["2022", "1"], ["2022", "2"], ["2022", "3"], ["2015", "3"]].forEach(function (v) {
+      var key = [sr.publisher, sr.author, v[0], v[1]].join("|");
+      var b = DATA.books[key];
+      var users = {};   // 학년도 → [학교 번호]
+      DATA.schools.forEach(function (s, i) {
+        Object.keys(s.years).forEach(function (y) { var t = s.years[y][v[1]]; if (t && bookKey(t, v[1]) === key) (users[y] || (users[y] = [])).push(i); });
       });
-      if (!shown.length) { var e = el("div", "empty"); e.appendChild(el("b", null, "맞는 교과서가 없습니다")); rows.appendChild(e); }
-    }
-    inp.addEventListener("input", function () { state.bq = inp.value; fill(); });
-    fill();
+      if (!b && !Object.keys(users).length) return;
+      var sec = el("section", "grade");
+      var head = el("div", "g-head");
+      head.appendChild(paint(el("span", "g-tag", "중" + v[1]), pubColor(sr.publisher)));
+      head.appendChild(el("h2", null, "영어 " + v[1] + " (" + v[0] + " 개정)"));
+      sec.appendChild(head);
+      var sub = el("div", "g-sub");
+      if (v[0] === "2015" || v[1] === "3") sub.appendChild(el("span", null, v[0] === "2015" ? "2026학년도까지 쓰는 책" : "2027학년도부터 쓰는 책"));
+      if (b) {
+        sub.appendChild(el("span", "pill " + (b.verified ? "ok" : "warn"), b.verified ? "교과서 원문 확인" : "2차 자료로 정리"));
+        if (b.verified && b.source) { var a = el("a", null, "출판사 공개 원문"); a.href = b.source; a.target = "_blank"; a.rel = "noopener noreferrer"; sub.appendChild(a); }
+      }
+      sec.appendChild(sub);
+      if (b && b.note) sec.appendChild(el("p", "g-note", b.note));
+      if (b) sec.appendChild(unitList(b)); else sec.appendChild(el("p", "g-note", "이 교과서는 단원을 아직 정리하지 않았습니다."));
+      (users["2026"] ? ["2026"] : Object.keys(users).sort().slice(-1)).forEach(function (y) {
+        var box = el("div", "users");
+        REGIONS.forEach(function (r) {
+          var is = users[y].filter(function (i) { return DATA.schools[i].region === r; });
+          if (!is.length) return;
+          var grp = el("div");
+          grp.appendChild(el("h3", null, regionShort(r) + " " + is.length + "곳"));
+          var names = el("div", "names");
+          is.forEach(function (i) {
+            var nb = el("button", null, shortSchool(DATA.schools[i].school)); nb.type = "button";
+            nb.addEventListener("click", function () { nav("#s-" + DATA.schools[i].code); });
+            names.appendChild(nb);
+          });
+          grp.appendChild(names);
+          box.appendChild(grp);
+        });
+        sec.appendChild(fold(y === "2026" ? "쓰는 학교 " + users[y].length + "곳" : y + "학년도에 쓰기로 한 학교 " + users[y].length + "곳 (공개한 학교만)", box, false));
+      });
+      app.appendChild(sec);
+    });
   }
-
-  function renderBook() {
-    var key = state.book; var p = key.split("|"); var b = DATA.books[key];
-    setBack(function () { goBack("#books"); }, "교과서 목록으로");
-    app.textContent = "";
-    var pf = el("section", "profile");
-    pf.appendChild(el("div", "p-av", monogram(p[0])));
-    var m = el("div", "p-main");
-    var nm = el("div", "p-name");
-    nm.appendChild(el("h1", null, shortPub(p[0]) + " " + p[1] + " · 영어 " + p[3]));
-    m.appendChild(nm);
-    var st = el("ul", "stats");
-    function stat(n, label) { var li = el("li"); li.appendChild(el("b", null, String(n))); li.appendChild(el("span", null, label)); st.appendChild(li); }
-    stat(b ? b.units.filter(function (u) { return !isExtra(u); }).length : "-", "단원");
-    stat(b ? b.units.reduce(function (n, u) { return n + u.grammar.length; }, 0) : "-", "문법");
-    stat(usedCount(key), "쓰는 학교");
-    m.appendChild(st);
-    pf.appendChild(m);
-    var bio = el("div", "bio");
-    bio.appendChild(el("span", null, p[0] + " · " + p[2] + " 개정 교육과정 · 중" + p[3]));
-    var l2 = el("div", "b-line");
-    if (b) {
-      l2.appendChild(el("span", "pill " + (b.verified ? "ok" : "warn"), b.verified ? "교과서 원문 확인" : "2차 자료로 정리"));
-      if (b.verified && b.source) { var a = el("a", null, "출판사 공개 원문"); a.href = b.source; a.target = "_blank"; a.rel = "noopener noreferrer"; l2.appendChild(a); }
-      if (!b.verified) l2.appendChild(el("span", "muted", "문제집 목차와 학원 정리 글을 맞춰 본 것입니다. 자료를 만들기 전에 교과서와 대조하세요."));
-    } else l2.appendChild(el("span", "pill neutral", "단원 정리 전"));
-    bio.appendChild(l2);
-    pf.appendChild(bio);
-    app.appendChild(pf);
-    renderBody(key, b, [["grid", "단원", "grid"], ["list", "문법 목록", "list"], ["users", "쓰는 학교", "people"]]);
-  }
-
-  /* 화면 고르기: 주소의 # 가 곧 화면이다 (휴대폰 뒤로 가기가 그대로 동작) */
-  var ALLKEYS = [];
-  var moved = 0;      // 이 페이지 안에서 앞으로 간 횟수
-  var lastBase = null;
-  function nav(h) { moved++; location.hash = h; }
-  function goBack(fallback) { if (moved > 0) { moved--; history.back(); } else location.hash = fallback; }
-  function route() {
-    var raw = location.hash, h = raw.replace(/~u$/, "");
-    var ov = document.querySelector(".ureels");
-    if (ov && !/~u$/.test(raw) && ov.__close) ov.__close();
-    if (/~u$/.test(raw) && !ov) { try { history.replaceState(null, "", h || "#schools"); } catch (e) {} }
-    if (h === lastBase && DATA) return;   // 단원 크게 보기만 닫힌 경우: 화면은 그대로
-    var bm = /^#b-(\d+)$/.exec(h), sm = /^#s-(\d+)$/.exec(h);
-    var v = (h === "#books" || bm) ? "books" : "schools";
-    state.view = v;
-    document.getElementById("v-schools").setAttribute("aria-current", v === "schools" ? "page" : "false");
-    document.getElementById("v-books").setAttribute("aria-current", v === "books" ? "page" : "false");
-    if (!DATA) return;
-    lastBase = h;
-    window.scrollTo(0, 0);
-    if (bm && ALLKEYS[+bm[1]]) { state.book = ALLKEYS[+bm[1]]; renderBook(); return; }
-    if (v === "books") { state.book = null; renderBookSearch(); return; }
-    if (sm) {
-      var i = DATA.schools.findIndex(function (s) { return s.code === sm[1]; });
-      if (i >= 0) { state.school = i; state.region = DATA.schools[i].region; renderProfile(); return; }
-    }
-    state.school = -1;
-    renderSchoolSearch();
-  }
-  document.getElementById("v-schools").addEventListener("click", function (e) { e.preventDefault(); if (location.hash.replace(/~u$/, "") !== "#schools") nav("#schools"); });
-  document.getElementById("v-books").addEventListener("click", function (e) { e.preventDefault(); if (location.hash.replace(/~u$/, "") !== "#books") nav("#books"); });
-  window.addEventListener("hashchange", route);
-  route();
 
   fetch("data/textbooks.json", { cache: "no-store" }).then(function (r) {
     if (!r.ok) throw new Error("HTTP " + r.status);
     return r.json();
   }).then(function (d) {
     DATA = d;
-    BOOKS = Object.keys(d.books);
-    var all = {};
-    BOOKS.forEach(function (k) { all[k] = true; });
-    d.schools.forEach(function (s) { Object.keys(s.years).forEach(function (y) { Object.keys(s.years[y]).forEach(function (g) { all[bookKey(s.years[y][g], g)] = true; }); }); });
-    ALLKEYS = Object.keys(all).sort(function (a, b) {
-      var A = a.split("|"), B = b.split("|");
-      return (B[2] - A[2]) || (A[3] - B[3]) || (usedCount(b) - usedCount(a)) || a.localeCompare(b, "ko");
+    d.schools.forEach(function (s, i) {
+      if (REGIONS.indexOf(s.region) < 0) REGIONS.push(s.region);
+      Object.keys(s.years).forEach(function (y) {
+        Object.keys(s.years[y]).forEach(function (g) {
+          var t = s.years[y][g], k = serKey(t);
+          var sr = SER[k] || (SER[k] = { publisher: t.publisher, author: t.author, use: {}, cur: {} });
+          sr.cur[t.curriculum] = true;
+          var u = sr.use[y] || (sr.use[y] = {});
+          (u[g] || (u[g] = [])).push(i);
+        });
+      });
     });
-    state.region = recall("region");
-    var t = recall("tab"); if (t) state.tab = t;
-    var code = recall("school");
-    if (code && !/^#(s-\d+|b-\d+|books|schools)/.test(location.hash)) {
-      var i = d.schools.findIndex(function (s) { return s.code === code; });
-      if (i >= 0) { state.region = d.schools[i].region; try { history.replaceState(null, "", "#s-" + code); } catch (e) {} }
-    }
-    var regs = [];
-    d.schools.forEach(function (s) { var r = regionShort(s.region); if (regs.indexOf(r) < 0) regs.push(r); });
+    Object.keys(d.books).forEach(function (key) {
+      var b = d.books[key], k = b.publisher + "|" + b.author;
+      if (!SER[k]) SER[k] = { publisher: b.publisher, author: b.author, use: {}, cur: {} };
+      SER[k].cur[b.curriculum] = true;
+    });
+    var ORDER = ["경기 수원", "경기 화성", "경기 용인", "경기 오산"];
+    REGIONS.sort(function (a, b) { return (ORDER.indexOf(a) + 1 || 99) - (ORDER.indexOf(b) + 1 || 99); });
+    SERKEYS = Object.keys(SER).sort(function (a, b) { return seriesTotal(b) - seriesTotal(a) || a.localeCompare(b, "ko"); });
+    var v = recall("view"); if (v === "list" || v === "map" || v === "books") state.view = v;
+    var rg = recall("region"); if (rg === "all" || REGIONS.indexOf(rg) >= 0) state.region = rg;
+    var mg = recall("mgrade"); if (mg === "1" || mg === "2" || mg === "3") state.mgrade = mg;
     var foot = document.getElementById("foot");
-    foot.appendChild(el("p", null, "학교 " + d.schools.length + "곳 (경기 " + regs.join(" · ") + "), 단원 정리된 교과서 " + BOOKS.length + "권 · 자료 정리일 " + d.updated));
-    foot.appendChild(el("p", null, "\"학교 확인\"은 학교 누리집 공지, \"블로그 확인\"은 학원 블로그 두 곳 이상, \"추정\"은 전년도 목록 기준입니다."));
+    foot.appendChild(el("p", null, "학교 " + d.schools.length + "곳 (경기 " + REGIONS.map(regionShort).join(" · ") + "), 단원을 정리한 교과서 " + Object.keys(d.books).length + "권 · 자료 정리일 " + d.updated));
+    foot.appendChild(el("p", null, "따로 표시가 없으면 학교 누리집 공지에서 확인한 값입니다. \"블로그 확인\"은 학원 블로그 두 곳 이상, \"추정\"은 전년도 목록 기준입니다."));
     route();
   }).catch(function () {
     app.textContent = "";
